@@ -3,68 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lincoln Clicker</title>
+    <title>Lincoln's Easter Resurrection</title>
     <link rel="icon" type="image/jpeg" href="IMG_0668.jpg">
     <style>
-        .raindrop { position: fixed; top: -10px; width: 2px; height: 15px; background: #00d2ff; opacity: 0.6; pointer-events: none; z-index: 9998; animation: rain-fall linear forwards; }
-        @keyframes rain-fall { to { transform: translateY(110vh); } }
-        
-        :root { --primary: #6c5ce7; --secondary: #a29bfe; --bg: #1e272e; --gold: #f1c40f; --success: #55efc4; }
+        :root { 
+            --lavender: #e0b0ff; 
+            --royal-purple: #6a0dad; 
+            --white: #ffffff; 
+            --joy-pink: #ffafcc; 
+            --hope-yellow: #fff3b0; 
+            --growth-green: #7bf1a8;
+            --gold: #f1c40f;
+        }
 
         body {
             font-family: 'Arial Rounded MT Bold', sans-serif;
-            background: #1e272e;
+            background: var(--lavender);
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
-            color: white; margin: 0; display: flex; justify-content: center; min-height: 100vh; overflow-x: hidden;
+            color: var(--royal-purple); margin: 0; display: flex; justify-content: center; min-height: 100vh; overflow-x: hidden;
         }
 
-        .bg-kitchen { background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=1200'); }
-        .bg-buffet { background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1200'); }
-        .bg-factory { background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1200'); }
-        .bg-space { background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200'); }
+        /* Easter Background Themes */
+        .bg-kitchen { background-image: linear-gradient(rgba(255,255,255,0.7), rgba(255,255,255,0.7)), url('https://images.unsplash.com/photo-1522336572468-97b06e8ef143?auto=format&fit=crop&w=1200'); }
+        .bg-buffet { background-image: linear-gradient(rgba(255,255,255,0.7), rgba(255,255,255,0.7)), url('https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=1200'); }
+        .bg-factory { background-image: linear-gradient(rgba(255,255,255,0.7), rgba(255,255,255,0.7)), url('https://images.unsplash.com/photo-1550592704-6c76defa9985?auto=format&fit=crop&w=1200'); }
+        .bg-space { background-image: linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.6)), url('https://images.unsplash.com/photo-1534067783941-51c9c23ecefd?auto=format&fit=crop&w=1200'); }
 
         #game-wrapper { max-width: 1200px; width: 100%; display: flex; gap: 20px; padding: 20px; box-sizing: border-box; z-index: 1; }
         .left-column { flex: 1; display: flex; flex-direction: column; gap: 20px; }
         .clicker-section { text-align: center; display: flex; flex-direction: column; align-items: center; }
 
         #score-panel {
-            background: rgba(0, 0, 0, 0.8); padding: 20px; border-radius: 20px;
-            border: 3px solid var(--primary); width: 100%; backdrop-filter: blur(15px);
+            background: rgba(255, 255, 255, 0.9); padding: 20px; border-radius: 30px;
+            border: 4px solid var(--royal-purple); width: 100%; backdrop-filter: blur(10px);
+            box-shadow: 0 10px 20px rgba(106, 13, 173, 0.2);
         }
 
-        #score-text { font-size: 3.5rem; color: var(--gold); margin: 0; line-height: 1.2; }
+        #score-text { font-size: 3.5rem; color: var(--royal-purple); margin: 0; line-height: 1.2; text-shadow: 2px 2px var(--joy-pink); }
 
         #lincoln-main {
             width: 280px; height: 280px; border-radius: 50%; cursor: pointer;
-            object-fit: cover; border: 8px solid var(--secondary);
+            object-fit: cover; border: 8px solid var(--white);
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.8);
             transition: transform 0.05s, filter 0.3s; user-select: none; margin-top: 10px;
         }
-        #lincoln-main:active { transform: scale(0.94); }
+        #lincoln-main:active { transform: scale(0.96); }
 
         .shop-container {
-            flex: 1.2; background: rgba(0, 0, 0, 0.5); padding: 15px;
-            border-radius: 20px; height: 90vh; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
+            flex: 1.2; background: rgba(255, 255, 255, 0.6); padding: 15px;
+            border-radius: 30px; height: 90vh; overflow-y: auto; border: 2px solid var(--white);
+            backdrop-filter: blur(15px);
         }
 
         .upgrade {
-            width: 100%; background: #2f3542; border: 2px solid #444;
-            border-radius: 12px; padding: 12px 18px; color: white; cursor: pointer;
+            width: 100%; background: var(--white); border: 3px solid var(--lavender);
+            border-radius: 15px; padding: 12px 18px; color: var(--royal-purple); cursor: pointer;
             display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
+            transition: 0.2s;
         }
-        .can-afford { border-color: var(--gold) !important; background: #3e4452; }
+        .can-afford { border-color: var(--growth-green) !important; background: var(--hope-yellow); }
         .u-info { text-align: left; }
-        .u-name { font-weight: bold; color: #fab1a0; display: block; }
-        .u-cost { color: var(--success); font-size: 0.9rem; }
-        .u-count { font-size: 1.5rem; font-weight: bold; opacity: 0.6; }
+        .u-name { font-weight: bold; color: var(--royal-purple); display: block; font-size: 1.1rem; }
+        .u-desc { font-size: 0.75rem; color: #666; display: block; }
+        .u-cost { color: #2d3436; font-size: 0.9rem; font-weight: bold; margin-top: 4px; display: block; }
+        .u-count { font-size: 1.8rem; font-weight: bold; color: var(--joy-pink); opacity: 0.8; }
 
-        .prestige-btn { background: var(--gold); color: black; font-weight: bold; width: 100%; padding: 15px; border-radius: 12px; border: none; cursor: pointer; margin-top: 10px; animation: pulse-gold 2s infinite; }
+        .prestige-btn { background: var(--royal-purple); color: white; font-weight: bold; width: 100%; padding: 15px; border-radius: 15px; border: none; cursor: pointer; margin-top: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
         
-        .particle { position: fixed; pointer-events: none; animation: flyUp 0.8s forwards; font-weight: bold; color: var(--gold); z-index: 999; }
+        .particle { position: fixed; pointer-events: none; animation: flyUp 0.8s forwards; font-weight: bold; color: var(--royal-purple); z-index: 999; font-size: 1.2rem; }
         @keyframes flyUp { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-120px); opacity: 0; } }
-        @keyframes pulse-gold { 0% { box-shadow: 0 0 0 0 rgba(241, 196, 15, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(241, 196, 15, 0); } 100% { box-shadow: 0 0 0 0 rgba(241, 196, 15, 0); } }
     </style>
 </head>
 <body class="bg-kitchen">
@@ -74,18 +83,18 @@
         <div class="clicker-section">
             <div id="score-panel">
                 <h1 id="score-text">0</h1>
-                <p id="env-label" style="margin: 5px 0 2px 0; letter-spacing: 2px; font-size: 0.7rem; color: #aaa;">LOCATION: THE KITCHEN</p>
-                <p id="save-status" style="margin: 0; font-size: 0.6rem; color: #777; font-style: italic;">Saved at --:--</p>
+                <p id="env-label" style="margin: 5px 0 2px 0; letter-spacing: 2px; font-size: 0.7rem; font-weight: bold; color: var(--royal-purple);">SEASON: LENTEN KITCHEN</p>
+                <p id="save-status" style="margin: 0; font-size: 0.6rem; color: #888; font-style: italic;">Saved at --:--</p>
                 
-                <div style="font-size: 0.8rem; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; margin-top: 10px;">
-                    Per Click: <span id="stat-click">1</span> | Sec: <span id="stat-cps">0</span><br>
-                    Golden Tortas: <span id="stat-prestige" style="color:var(--gold)">0</span>
+                <div style="font-size: 0.8rem; background: var(--white); padding: 10px; border-radius: 15px; margin-top: 10px; border: 1px solid var(--lavender);">
+                    Power: <span id="stat-click">1</span> | Faith/sec: <span id="stat-cps">0</span><br>
+                    <span style="color:var(--royal-purple); font-weight: bold;">Golden Eggs: <span id="stat-prestige">0</span></span>
                 </div>
             </div>
             <img src="IMG_0688.jpg" id="lincoln-main" alt="Lincoln">
-            <button class="prestige-btn" id="prestige-btn" style="display:none;" onclick="prestige()">WEIGH IN</button>
+            <button class="prestige-btn" id="prestige-btn" style="display:none;" onclick="prestige()">ASCEND (WEIGH IN)</button>
             <div style="margin-top:20px;">
-                <button onclick="resetGame()" style="background:none; border:none; color:#555; cursor:pointer; font-size: 0.7rem; text-decoration: underline;">Hard Reset Game</button>
+                <button onclick="resetGame()" style="background:none; border:none; color:var(--royal-purple); cursor:pointer; font-size: 0.7rem; text-decoration: underline; opacity: 0.6;">Hard Reset</button>
             </div>
         </div>
     </div>
@@ -96,21 +105,21 @@
 let energy = 0, clickPower = 1, cps = 0, goldenTortas = 0;
 
 const initialUpgrades = [
-    { id: 0, name: "Extra Torta", cost: 15, power: 0.1, type: "click", desc: "+0.1 Click Power" },
-    { id: 1, name: "Chud Burger", cost: 100, power: 0.3, type: "cps", desc: "+0.3 Mass/sec" },
-    { id: 2, name: "The Lard-o-Meter", cost: 500, power: 0.8, type: "cps", desc: "+0.8 Mass/sec" },
-    { id: 3, name: "Bulk Season", cost: 1200, power: 0.6, type: "click", desc: "+0.6 Click Power" },
-    { id: 4, name: "Torta Pounder 3000", cost: 3000, power: 2.5, type: "cps", desc: "+2.5 Mass/sec" },
-    { id: 5, name: "Infinite Buffet Pass", cost: 10000, power: 7.0, type: "cps", desc: "+7.0 Mass/sec" },
-    { id: 6, name: "Chudmosis", cost: 25000, power: 15.0, type: "cps", desc: "+15.0 Mass/sec" },
-    { id: 7, name: "Deep Fried Top Hat", cost: 85000, power: 50.0, type: "cps", desc: "+50.0 Mass/sec" },
-    { id: 8, name: "Torta Transfusion", cost: 200000, power: 12, type: "click", desc: "+12 Click Power" },
-    { id: 9, name: "Gravy Shower", cost: 500000, power: 150, type: "cps", desc: "+150 Mass/sec" },
-    { id: 10, name: "Mega-Chud Transformation", cost: 2000000, power: 500, type: "cps", desc: "+500 Mass/sec" },
-    { id: 11, name: "The Giga-Torta", cost: 8000000, power: 1500, type: "cps", desc: "+1500 Mass/sec" },
-    { id: 12, name: "Sumo Lincoln", cost: 40000000, power: 1200, type: "click", desc: "+1200 Click Power" },
-    { id: 13, name: "Event Horizon Gut", cost: 150000000, power: 18000, type: "cps", desc: "+18k Mass/sec" },
-    { id: 14, name: "The Final Chud-down", cost: 2500000000, power: 120000, type: "cps", desc: "+120k Mass/sec" }
+    { id: 0, name: "Blessed Lily", cost: 15, power: 0.1, type: "click", desc: "A symbol of purity. +0.1 Click" },
+    { id: 1, name: "Palm Branch", cost: 100, power: 0.3, type: "cps", desc: "Waving in victory. +0.3/sec" },
+    { id: 2, name: "Woven Basket", cost: 500, power: 0.8, type: "cps", desc: "To hold the harvest. +0.8/sec" },
+    { id: 3, name: "Pastel Dye", cost: 1200, power: 0.6, type: "click", desc: "Joyful colors. +0.6 Click" },
+    { id: 4, name: "Spring Lamb", cost: 3000, power: 2.5, type: "cps", desc: "New life begins. +2.5/sec" },
+    { id: 5, name: "Morning Dew", cost: 10000, power: 7.0, type: "cps", desc: "Fresh grace. +7.0/sec" },
+    { id: 6, name: "Royal Robe", cost: 25000, power: 15.0, type: "cps", desc: "Purple for the King. +15/sec" },
+    { id: 7, name: "Golden Censer", cost: 85000, power: 50.0, type: "cps", desc: "Sweet incense rising. +50/sec" },
+    { id: 8, name: "Stone Rolled Away", cost: 200000, power: 12, type: "click", desc: "The power of life! +12 Click" },
+    { id: 9, name: "Choir of Angels", cost: 500000, power: 150, type: "cps", desc: "Hallelujah! +150/sec" },
+    { id: 10, name: "The Empty Tomb", cost: 2000000, power: 500, type: "cps", desc: "Victory over death. +500/sec" },
+    { id: 11, name: "Mount of Olives", cost: 8000000, power: 1500, type: "cps", desc: "Grand height. +1500/sec" },
+    { id: 12, name: "Crown of Life", cost: 40000000, power: 1200, type: "click", desc: "Eternal reward. +1200 Click" },
+    { id: 13, name: "Heavenly Banquet", cost: 150000000, power: 18000, type: "cps", desc: "Infinite joy. +18k/sec" },
+    { id: 14, name: "Resurrection Light", cost: 2500000000, power: 120000, type: "cps", desc: "The world made new. +120k/sec" }
 ];
 
 let upgrades = JSON.parse(JSON.stringify(initialUpgrades));
@@ -140,16 +149,16 @@ function updateUI() {
         if (btn) {
             btn.disabled = energy < u.cost;
             energy >= u.cost ? btn.classList.add('can-afford') : btn.classList.remove('can-afford');
-            document.getElementById(`cost-${u.id}`).innerText = u.cost.toLocaleString() + " Mass";
+            document.getElementById(`cost-${u.id}`).innerText = u.cost.toLocaleString() + " Faith";
             document.getElementById(`count-${u.id}`).innerText = u.count || 0;
         }
     });
 
     const body = document.body; const label = document.getElementById('env-label');
-    if (energy < 100000) { body.className = 'bg-kitchen'; label.innerText = "LOCATION: THE KITCHEN"; }
-    else if (energy < 10000000) { body.className = 'bg-buffet'; label.innerText = "LOCATION: INFINITE BUFFET"; }
-    else if (energy < 1000000000) { body.className = 'bg-factory'; label.innerText = "LOCATION: TORTA FACTORY"; }
-    else { body.className = 'bg-space'; label.innerText = "LOCATION: OUTER SPACE"; }
+    if (energy < 100000) { body.className = 'bg-kitchen'; label.innerText = "SEASON: LENTEN KITCHEN"; }
+    else if (energy < 10000000) { body.className = 'bg-buffet'; label.innerText = "SEASON: SPRING GARDEN"; }
+    else if (energy < 1000000000) { body.className = 'bg-factory'; label.innerText = "SEASON: CATHEDRAL HALL"; }
+    else { body.className = 'bg-space'; label.innerText = "SEASON: THE NEW JERUSALEM"; }
 }
 
 function initShop() {
@@ -158,7 +167,7 @@ function initShop() {
         const btn = document.createElement('button');
         btn.className = 'upgrade'; btn.id = `up-${u.id}`;
         btn.onclick = () => buyUpgrade(u.id);
-        btn.innerHTML = `<div class="u-info"><span class="u-name">${u.name}</span><span class="u-desc">${u.desc}</span><span class="u-cost" id="cost-${u.id}">${u.cost.toLocaleString()} Mass</span></div><div class="u-count" id="count-${u.id}">${u.count || 0}</div>`;
+        btn.innerHTML = `<div class="u-info"><span class="u-name">${u.name}</span><span class="u-desc">${u.desc}</span><span class="u-cost" id="cost-${u.id}">${u.cost.toLocaleString()} Faith</span></div><div class="u-count" id="count-${u.id}">${u.count || 0}</div>`;
         shop.appendChild(btn);
     });
 }
@@ -178,7 +187,7 @@ function buyUpgrade(id) {
 function prestige() {
     if (energy < 1000000000) return;
     const bonus = Math.floor(Math.log10(energy / 1000000000)) + 1;
-    if (confirm(`Weigh in for ${bonus} Golden Tortas? (This resets Mass and Upgrades but gives a permanent boost!)`)) {
+    if (confirm(`Ascend for ${bonus} Golden Eggs? (Resets progress for eternal power!)`)) {
         goldenTortas += bonus;
         energy = 0; clickPower = 1; cps = 0;
         upgrades = JSON.parse(JSON.stringify(initialUpgrades));
@@ -192,26 +201,24 @@ function showParticle(x, y, text) {
     document.body.appendChild(p); setTimeout(() => p.remove(), 800);
 }
 
-// Updated Save Function with Timestamp
 function saveGame() {
-    localStorage.setItem('lincoln_save_local', JSON.stringify({
+    localStorage.setItem('lincoln_easter_save', JSON.stringify({
         energy, clickPower, cps, goldenTortas, upgrades
     }));
     
-    // Get Current Time in EST format
     const now = new Date();
     const timeString = now.toLocaleTimeString('en-US', { 
         timeZone: 'America/New_York', 
         hour: '2-digit', 
         minute: '2-digit',
         hour12: true 
-    }).replace(/^0/, ''); // Removes leading zero if necessary
+    }).replace(/^0/, '');
 
     document.getElementById('save-status').innerText = `Saved at ${timeString}`;
 }
 
 function loadGame() {
-    const saved = localStorage.getItem('lincoln_save_local');
+    const saved = localStorage.getItem('lincoln_easter_save');
     if (saved) {
         const d = JSON.parse(saved);
         energy = d.energy || 0;
@@ -225,9 +232,8 @@ function loadGame() {
 
 function resetGame() { if (confirm("Completely reset your progress?")) { localStorage.clear(); location.reload(); } }
 
-// Start game immediately
 loadGame();
-setInterval(saveGame, 10000); // Auto-save every 10 seconds
+setInterval(saveGame, 10000); 
 </script>
 </body>
 </html>
