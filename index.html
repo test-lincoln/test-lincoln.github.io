@@ -25,7 +25,7 @@
             color: var(--deep-purple); margin: 0; display: flex; justify-content: center; min-height: 100vh; overflow-x: hidden;
         }
 
-        /* Spring Garden Themes */
+        /* Backgrounds */
         .bg-kitchen { background-image: linear-gradient(rgba(255,255,255,0.7), rgba(255,255,255,0.7)), url('https://images.unsplash.com/photo-1522336572468-97b06e8ef143?auto=format&fit=crop&w=1200'); }
         .bg-buffet { background-image: linear-gradient(rgba(255,255,255,0.7), rgba(255,255,255,0.7)), url('https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=1200'); }
         .bg-factory { background-image: linear-gradient(rgba(255,255,255,0.7), rgba(255,255,255,0.7)), url('https://images.unsplash.com/photo-1558961312-30ca048846c8?auto=format&fit=crop&w=1200'); }
@@ -84,7 +84,7 @@
             <div id="score-panel">
                 <h1 id="score-text">0</h1>
                 <p id="env-label" style="margin: 5px 0 2px 0; letter-spacing: 2px; font-size: 0.7rem; font-weight: bold; color: var(--bubblegum);">LOCATION: THE GARDEN GATE</p>
-                <p id="save-status" style="margin: 0; font-size: 0.6rem; color: #aaa; font-style: italic;">Saved at --:--</p>
+                <p id="save-status" style="margin: 0; font-size: 0.6rem; color: #aaa; font-style: italic;">Ready to hunt!</p>
                 
                 <div style="font-size: 0.8rem; background: var(--white); padding: 10px; border-radius: 20px; margin-top: 10px; border: 1px solid var(--lavender);">
                     Click Power: <span id="stat-click">1</span> | Eggs/sec: <span id="stat-cps">0</span><br>
@@ -102,6 +102,8 @@
 </div>
 
 <script>
+// --- CORE GAME DATA ---
+const SAVE_KEY = "lincoln_ultimate_save"; // Keep this the same across all future updates!
 let energy = 0, clickPower = 1, cps = 0, goldenTortas = 0;
 
 const initialUpgrades = [
@@ -123,6 +125,8 @@ const initialUpgrades = [
 ];
 
 let upgrades = JSON.parse(JSON.stringify(initialUpgrades));
+
+// --- LOGIC ---
 
 document.getElementById('lincoln-main').addEventListener('click', (e) => {
     let val = clickPower * (1 + (goldenTortas * 0.1));
@@ -201,10 +205,16 @@ function showParticle(x, y, text) {
     document.body.appendChild(p); setTimeout(() => p.remove(), 800);
 }
 
+// --- PERSISTENT SAVING ---
 function saveGame() {
-    localStorage.setItem('lincoln_egg_save', JSON.stringify({
-        energy, clickPower, cps, goldenTortas, upgrades
-    }));
+    const gameData = {
+        energy,
+        clickPower,
+        cps,
+        goldenTortas,
+        upgrades
+    };
+    localStorage.setItem(SAVE_KEY, JSON.stringify(gameData));
     
     const now = new Date();
     const timeString = now.toLocaleTimeString('en-US', { 
@@ -214,26 +224,44 @@ function saveGame() {
         hour12: true 
     }).replace(/^0/, '');
 
-    document.getElementById('save-status').innerText = `Saved at ${timeString}`;
+    document.getElementById('save-status').innerText = `Saved at ${timeString} (EST)`;
 }
 
 function loadGame() {
-    const saved = localStorage.getItem('lincoln_egg_save');
+    const saved = localStorage.getItem(SAVE_KEY);
     if (saved) {
         const d = JSON.parse(saved);
         energy = d.energy || 0;
         clickPower = d.clickPower || 1;
         cps = d.cps || 0;
         goldenTortas = d.goldenTortas || 0;
-        if (d.upgrades) upgrades = d.upgrades;
+        
+        // This part is clever: it merges saved upgrades with the current list
+        // so if you add NEW upgrades in the future, they appear even for old players!
+        if (d.upgrades) {
+            d.upgrades.forEach(savedU => {
+                const currentU = upgrades.find(u => u.id === savedU.id);
+                if (currentU) {
+                    currentU.count = savedU.count;
+                    currentU.cost = savedU.cost;
+                }
+            });
+        }
     }
-    initShop(); updateUI();
+    initShop(); 
+    updateUI();
 }
 
-function resetGame() { if (confirm("Clear your basket and start over?")) { localStorage.clear(); location.reload(); } }
+function resetGame() { 
+    if (confirm("Clear your basket and start over? This wipes all progress!")) { 
+        localStorage.removeItem(SAVE_KEY); 
+        location.reload(); 
+    } 
+}
 
+// Start game
 loadGame();
-setInterval(saveGame, 10000); 
+setInterval(saveGame, 10000); // Auto-save every 10 seconds
 </script>
 </body>
 </html>
