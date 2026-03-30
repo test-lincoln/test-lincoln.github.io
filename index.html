@@ -74,7 +74,9 @@
         <div class="clicker-section">
             <div id="score-panel">
                 <h1 id="score-text">0</h1>
-                <p id="env-label" style="margin: 5px 0; letter-spacing: 2px; font-size: 0.7rem; color: #aaa;">LOCATION: THE KITCHEN</p>
+                <p id="env-label" style="margin: 5px 0 2px 0; letter-spacing: 2px; font-size: 0.7rem; color: #aaa;">LOCATION: THE KITCHEN</p>
+                <p id="save-status" style="margin: 0; font-size: 0.6rem; color: #777; font-style: italic;">Saved at --:--</p>
+                
                 <div style="font-size: 0.8rem; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; margin-top: 10px;">
                     Per Click: <span id="stat-click">1</span> | Sec: <span id="stat-cps">0</span><br>
                     Golden Tortas: <span id="stat-prestige" style="color:var(--gold)">0</span>
@@ -190,10 +192,22 @@ function showParticle(x, y, text) {
     document.body.appendChild(p); setTimeout(() => p.remove(), 800);
 }
 
+// Updated Save Function with Timestamp
 function saveGame() {
     localStorage.setItem('lincoln_save_local', JSON.stringify({
         energy, clickPower, cps, goldenTortas, upgrades
     }));
+    
+    // Get Current Time in EST format
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('en-US', { 
+        timeZone: 'America/New_York', 
+        hour: '2-digit', 
+        minute: '2-digit',
+        hour12: true 
+    }).replace(/^0/, ''); // Removes leading zero if necessary
+
+    document.getElementById('save-status').innerText = `Saved at ${timeString}`;
 }
 
 function loadGame() {
@@ -213,7 +227,7 @@ function resetGame() { if (confirm("Completely reset your progress?")) { localSt
 
 // Start game immediately
 loadGame();
-setInterval(saveGame, 5000); // Auto-save every 5 seconds
+setInterval(saveGame, 10000); // Auto-save every 10 seconds
 </script>
 </body>
 </html>
