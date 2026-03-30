@@ -90,9 +90,9 @@
             width: 100%; background: rgba(255,255,255,0.5); border-radius: 10px; height: 20px;
             margin-top: 10px; overflow: hidden; border: 2px solid var(--white);
         }
-        #global-bar-fill { height: 100%; width: 45%; background: var(--grass); transition: width 0.5s ease; }
+        #global-bar-fill { height: 100%; width: 0%; background: var(--grass); transition: width 0.5s ease; }
 
-        /* FIXED SHOP CONTAINER - Added Flex to prevent squishing */
+        /* FIXED SHOP CONTAINER */
         .shop-container {
             flex: 1.2; background: rgba(255, 255, 255, 0.4); padding: 15px;
             border-radius: 30px; height: 90vh; overflow-y: auto; border: 2px solid var(--white);
@@ -116,7 +116,7 @@
             transition: 0.2s ease;
             box-sizing: border-box;
             min-height: 85px; 
-            flex-shrink: 0; /* Prevents button height from collapsing */
+            flex-shrink: 0;
         }
 
         .can-afford { 
@@ -189,7 +189,7 @@
 
         <div class="log-section">
             <h3>📈 Global Hunt Progress</h3>
-            <p>Check the new progress bar! As you collect eggs, you'll help reach the "Spring Revelry." Reach 1 Billion eggs to unlock the <b>Big Reveal</b> and earn Golden Carrots.</p>
+            <p>The hunt progress bar now updates daily! We reach the "Spring Revelry" in exactly 7 days. Reach 1 Billion eggs to unlock the <b>Big Reveal</b> and earn Golden Carrots.</p>
         </div>
 
         <div class="log-section">
@@ -217,7 +217,7 @@
                 <div id="global-bar-container">
                     <div id="global-bar-fill"></div>
                 </div>
-                <p style="font-size: 0.6rem; margin-top: 5px;">GLOBAL HUNT PROGRESS: 45% TO SPRING REVELRY</p>
+                <p id="global-text" style="font-size: 0.6rem; margin-top: 5px;">GLOBAL HUNT PROGRESS: 0% TO SPRING REVELRY</p>
             </div>
             <img src="IMG_0724.jpeg" id="lincoln-main" alt="Lincoln">
             
@@ -247,6 +247,28 @@ if (!sessionStorage.getItem('logSeen')) {
 const SAVE_KEY = "lincoln_ultimate_save"; 
 let energy = 0, clickPower = 1, cps = 0, goldenTortas = 0;
 let mysteryEggCost = 500;
+
+// --- 7-DAY PROGRESS LOGIC ---
+const START_DATE = new Date(2025, 3, 5); // April 5th, 2025
+
+function getHuntProgress() {
+    const now = new Date();
+    
+    // Check if it's before April 5th
+    if (now < START_DATE) {
+        return -1; // Special flag for "not started yet"
+    }
+
+    const diffTime = now - START_DATE;
+    const diffDays = diffTime / (1000 * 60 * 60 * 24);
+    
+    let percent = (diffDays / 7) * 100;
+    
+    if (percent < 0) percent = 0;
+    if (percent > 100) percent = 100;
+    
+    return Math.floor(percent);
+}
 
 const initialUpgrades = [
     { id: 0, name: "Marshmallow Chick", cost: 15, power: 0.1, type: "click", desc: "Sweet and squishy. +0.1 Click" },
@@ -326,8 +348,15 @@ function updateUI() {
     document.getElementById('stat-prestige').innerText = goldenTortas;
     document.getElementById('prestige-btn').style.display = energy >= 1000000000 ? 'block' : 'none';
     
-    let progress = Math.min(100, (energy / 1000000) * 100);
-    document.getElementById('global-bar-fill').style.width = (45 + (progress/10)) + "%";
+    // Update Daily Progress Bar
+    const huntPercent = getHuntProgress();
+    if (huntPercent === -1) {
+        document.getElementById('global-bar-fill').style.width = "0%";
+        document.getElementById('global-text').innerText = `GLOBAL HUNT STARTS ON APRIL 5TH`;
+    } else {
+        document.getElementById('global-bar-fill').style.width = huntPercent + "%";
+        document.getElementById('global-text').innerText = `GLOBAL HUNT PROGRESS: ${huntPercent}% TO SPRING REVELRY`;
+    }
 
     upgrades.forEach(u => {
         const btn = document.getElementById(`up-${u.id}`);
