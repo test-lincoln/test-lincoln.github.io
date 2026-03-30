@@ -31,29 +31,36 @@
         .bg-factory { background-image: linear-gradient(rgba(255,255,255,0.7), rgba(255,255,255,0.7)), url('https://images.unsplash.com/photo-1558961312-30ca048846c8?auto=format&fit=crop&w=1200'); }
         .bg-space { background-image: linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.6)), url('https://images.unsplash.com/photo-1534067783941-51c9c23ecefd?auto=format&fit=crop&w=1200'); }
 
-        #game-wrapper { max-width: 1400px; width: 100%; display: flex; gap: 20px; padding: 20px; box-sizing: border-box; z-index: 1; }
-        
-        /* Update Log Styling */
-        .log-container {
-            flex: 0.8;
-            background: rgba(255, 255, 255, 0.8);
-            padding: 15px;
-            border-radius: 20px;
-            border: 2px solid var(--deep-purple);
-            height: 90vh;
-            overflow-y: auto;
-            font-size: 0.85rem;
+        /* Update Log Button */
+        #log-open-btn {
+            position: fixed; top: 20px; right: 20px;
+            background: var(--deep-purple); color: white;
+            border: none; padding: 10px 20px; border-radius: 50px;
+            cursor: pointer; font-weight: bold; z-index: 100;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
-        .log-entry {
-            background: var(--white);
-            padding: 10px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            border-left: 5px solid var(--bubblegum);
-        }
-        .log-entry h4 { margin: 0 0 5px 0; color: var(--deep-purple); }
-        .log-entry ul { margin: 5px 0; padding-left: 20px; }
 
+        /* Pop-up Modal Styling */
+        #log-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); display: none;
+            justify-content: center; align-items: center; z-index: 2000;
+        }
+        #log-modal {
+            background: var(--white); width: 90%; max-width: 500px;
+            padding: 30px; border-radius: 30px; border: 5px solid var(--bubblegum);
+            max-height: 80vh; overflow-y: auto; text-align: left;
+        }
+        .log-section { margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .log-section h3 { color: var(--deep-purple); margin: 0 0 10px 0; }
+        .log-section p { font-size: 0.9rem; line-height: 1.4; color: #555; }
+        .close-log-btn {
+            background: var(--grass); color: #2d3436; width: 100%;
+            padding: 15px; border-radius: 15px; border: none;
+            font-weight: bold; cursor: pointer; font-size: 1.1rem;
+        }
+
+        #game-wrapper { max-width: 1200px; width: 100%; display: flex; gap: 20px; padding: 20px; box-sizing: border-box; z-index: 1; }
         .left-column { flex: 1; display: flex; flex-direction: column; gap: 20px; }
         .clicker-section { text-align: center; display: flex; flex-direction: column; align-items: center; }
 
@@ -78,7 +85,6 @@
             padding: 10px 20px; border-radius: 15px; cursor: pointer; font-weight: bold;
             margin-top: 15px; transition: 0.3s;
         }
-        #mystery-egg-btn:hover { background: var(--deep-purple); transform: scale(1.05); }
 
         #global-bar-container {
             width: 100%; background: rgba(255,255,255,0.5); border-radius: 10px; height: 20px;
@@ -99,14 +105,7 @@
             transition: 0.2s ease;
         }
         .can-afford { border-color: var(--grass) !important; background: var(--sunshine); transform: translateY(-2px); }
-        .u-info { text-align: left; }
-        .u-name { font-weight: bold; color: var(--deep-purple); display: block; font-size: 1.1rem; }
-        .u-desc { font-size: 0.75rem; color: #777; display: block; }
-        .u-cost { color: #444; font-size: 0.9rem; font-weight: bold; margin-top: 4px; display: block; }
-        .u-count { font-size: 1.8rem; font-weight: bold; color: var(--bubblegum); opacity: 0.9; }
 
-        .prestige-btn { background: var(--grass); color: #2d3436; font-weight: bold; width: 100%; padding: 15px; border-radius: 20px; border: none; cursor: pointer; margin-top: 10px; box-shadow: 0 5px 15px rgba(123, 241, 168, 0.4); }
-        
         .golden-egg {
             position: fixed; width: 60px; height: 80px; background: radial-gradient(circle, #fff3b0, #f1c40f);
             border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; cursor: pointer;
@@ -120,35 +119,37 @@
 </head>
 <body class="bg-kitchen">
 
-<div id="game-wrapper">
-    <div class="log-container">
-        <h2 style="text-align:center; color:var(--deep-purple);">UPDATE LOG</h2>
+<button id="log-open-btn" onclick="toggleLog(true)">Update Log</button>
+
+<div id="log-overlay">
+    <div id="log-modal">
+        <h2 style="text-align:center; color:var(--bubblegum);">PATCH NOTES</h2>
         
-        <div class="log-entry">
-            <h4>v1.3 - Security & Secrets</h4>
-            <ul>
-                <li><b>Lock Screen:</b> Added <code>index.html</code> gateway. Uses conditional string matching to verify access before loading game data.</li>
-                <li><b>Mystery Eggs:</b> Risk/Reward mechanic. 10% chance for a 5x payout, 50% chance to lose investment.</li>
-            </ul>
+        <div class="log-section">
+            <h3>🌟 The Golden Egg</h3>
+            <p>A rare Golden Egg now has a 30% chance to float across your screen every 30 seconds! Click it fast—it disappears after 10 seconds. Catching it gives you a massive bonus worth 15% of your total eggs!</p>
         </div>
 
-        <div class="log-entry">
-            <h4>v1.2 - The Golden Hunt</h4>
-            <ul>
-                <li><b>Golden Eggs:</b> Random spawn logic. Checks every 30s with a 30% success rate. Gives a percentage-based bonus (15% of current eggs).</li>
-                <li><b>Dynamic Backgrounds:</b> CSS classes now swap based on score thresholds using JavaScript's <code>if/else</code> logic.</li>
-            </ul>
+        <div class="log-section">
+            <h3>❓ Mystery Eggs</h3>
+            <p>Feeling lucky? Spend your eggs to crack a Mystery Egg. You might hit the <b>5x Jackpot</b>, get a small treat, or find nothing at all! The cost increases each time you play.</p>
         </div>
 
-        <div class="log-entry">
-            <h4>v1.1 - Persistence</h4>
-            <ul>
-                <li><b>Local Storage:</b> Game now saves automatically. Uses <code>JSON.stringify</code> to turn game objects into strings for your browser memory.</li>
-                <li><b>Prestige System:</b> Unlock Golden Carrots at 1 Billion eggs to multiply future earnings.</li>
-            </ul>
+        <div class="log-section">
+            <h3>📈 Global Hunt Progress</h3>
+            <p>Check the new progress bar! As you collect eggs, you'll help reach the "Spring Revelry." Reach 1 Billion eggs to unlock the <b>Big Reveal</b> and earn Golden Carrots.</p>
         </div>
+
+        <div class="log-section">
+            <h3>🛍️ New Shop Items</h3>
+            <p>Added 15 unique upgrades including the <b>Diamond Egg</b>, <b>Candy Kingdom</b>, and the ultimate <b>Easter Morning Sun</b>.</p>
+        </div>
+
+        <button class="close-log-btn" onclick="toggleLog(false)">START HUNTING!</button>
     </div>
+</div>
 
+<div id="game-wrapper">
     <div class="left-column">
         <div class="clicker-section">
             <div id="score-panel">
@@ -176,11 +177,21 @@
             </div>
         </div>
     </div>
-    
     <div class="shop-container" id="shop"></div>
 </div>
 
 <script>
+// --- LOG POP-UP LOGIC ---
+function toggleLog(show) {
+    document.getElementById('log-overlay').style.display = show ? 'flex' : 'none';
+}
+
+// Automatically show the log on the first visit of the session
+if (!sessionStorage.getItem('logSeen')) {
+    toggleLog(true);
+    sessionStorage.setItem('logSeen', 'true');
+}
+
 // --- CORE GAME DATA ---
 const SAVE_KEY = "lincoln_ultimate_save"; 
 let energy = 0, clickPower = 1, cps = 0, goldenTortas = 0;
