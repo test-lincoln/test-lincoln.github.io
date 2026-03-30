@@ -51,7 +51,6 @@
         }
         #lincoln-main:active { transform: scale(0.96); }
 
-        /* Mystery Egg Button */
         #mystery-egg-btn {
             background: var(--bubblegum); color: white; border: 3px solid var(--white);
             padding: 10px 20px; border-radius: 15px; cursor: pointer; font-weight: bold;
@@ -59,15 +58,11 @@
         }
         #mystery-egg-btn:hover { background: var(--deep-purple); transform: scale(1.05); }
 
-        /* Global Progress Bar */
         #global-bar-container {
             width: 100%; background: rgba(255,255,255,0.5); border-radius: 10px; height: 20px;
             margin-top: 10px; overflow: hidden; border: 2px solid var(--white);
         }
-        #global-bar-fill {
-            height: 100%; width: 45%; background: var(--grass);
-            transition: width 0.5s ease;
-        }
+        #global-bar-fill { height: 100%; width: 45%; background: var(--grass); transition: width 0.5s ease; }
 
         .shop-container {
             flex: 1.2; background: rgba(255, 255, 255, 0.4); padding: 15px;
@@ -90,16 +85,12 @@
 
         .prestige-btn { background: var(--grass); color: #2d3436; font-weight: bold; width: 100%; padding: 15px; border-radius: 20px; border: none; cursor: pointer; margin-top: 10px; box-shadow: 0 5px 15px rgba(123, 241, 168, 0.4); }
         
-        /* Golden Egg Animation */
         .golden-egg {
             position: fixed; width: 60px; height: 80px; background: radial-gradient(circle, #fff3b0, #f1c40f);
             border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; cursor: pointer;
             z-index: 1000; box-shadow: 0 0 20px var(--gold); animation: drift 10s linear forwards;
         }
-        @keyframes drift {
-            from { left: -100px; top: 20%; }
-            to { left: 110vw; top: 60%; }
-        }
+        @keyframes drift { from { left: -100px; top: 20%; } to { left: 110vw; top: 60%; } }
 
         .particle { position: fixed; pointer-events: none; animation: flyUp 0.8s forwards; font-weight: bold; color: var(--bubblegum); z-index: 999; font-size: 1.5rem; -webkit-text-stroke: 1px white; }
         @keyframes flyUp { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-120px) scale(1.5); opacity: 0; } }
@@ -164,7 +155,6 @@ const initialUpgrades = [
 
 let upgrades = JSON.parse(JSON.stringify(initialUpgrades));
 
-// --- CLICKING & TICKING ---
 document.getElementById('lincoln-main').addEventListener('click', (e) => {
     let val = clickPower * (1 + (goldenTortas * 0.1));
     energy += val;
@@ -178,7 +168,6 @@ setInterval(() => {
     updateUI(); 
 }, 100);
 
-// --- (1) GOLDEN EGG HUNT ---
 function spawnGoldenEgg() {
     const egg = document.createElement('div');
     egg.className = 'golden-egg';
@@ -192,18 +181,17 @@ function spawnGoldenEgg() {
     document.body.appendChild(egg);
     setTimeout(() => { if(egg) egg.remove(); }, 10000);
 }
-setInterval(() => { if(Math.random() < 0.3) spawnGoldenEgg(); }, 30000); // 30% chance every 30s
+setInterval(() => { if(Math.random() < 0.3) spawnGoldenEgg(); }, 30000);
 
-// --- (4) MYSTERY EGG CRACKER ---
 function crackMysteryEgg() {
     if (energy >= mysteryEggCost) {
         energy -= mysteryEggCost;
         const roll = Math.random();
-        if (roll < 0.1) { // 10% Jackpot
+        if (roll < 0.1) {
             let jackpot = mysteryEggCost * 5;
             energy += jackpot;
             alert("JACKPOT! You found a Golden Chick! +" + jackpot + " Eggs");
-        } else if (roll < 0.5) { // 40% Small prize
+        } else if (roll < 0.5) {
             let prize = mysteryEggCost * 1.5;
             energy += prize;
             alert("Sweet! You found some Jelly Beans! +" + Math.floor(prize) + " Eggs");
@@ -218,7 +206,6 @@ function crackMysteryEgg() {
     }
 }
 
-// --- UI UPDATES ---
 function updateUI() {
     document.getElementById('score-text').innerText = Math.floor(energy).toLocaleString();
     document.getElementById('stat-click').innerText = (clickPower * (1 + (goldenTortas * 0.1))).toFixed(1);
@@ -226,7 +213,6 @@ function updateUI() {
     document.getElementById('stat-prestige').innerText = goldenTortas;
     document.getElementById('prestige-btn').style.display = energy >= 1000000000 ? 'block' : 'none';
     
-    // (5) Global Bar logic (Visual only for now)
     let progress = Math.min(100, (energy / 1000000) * 100);
     document.getElementById('global-bar-fill').style.width = (45 + (progress/10)) + "%";
 
@@ -287,7 +273,6 @@ function showParticle(x, y, text) {
     document.body.appendChild(p); setTimeout(() => p.remove(), 800);
 }
 
-// --- PERSISTENT SAVING ---
 function saveGame() {
     const gameData = { energy, clickPower, cps, goldenTortas, upgrades, mysteryEggCost };
     localStorage.setItem(SAVE_KEY, JSON.stringify(gameData));
