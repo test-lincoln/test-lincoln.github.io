@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Locked</title>
+    <style>
+        body {
+            background-color: #0f0f0f;
+            color: #ffafcc;
+            font-family: 'Arial Rounded MT Bold', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+        .lock-box {
+            border: 4px solid #ffafcc;
+            padding: 50px;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 20px rgba(255, 175, 204, 0.2);
+        }
+        input {
+            background: #1a1a1a;
+            border: 2px solid #e0b0ff;
+            color: white;
+            padding: 15px;
+            border-radius: 15px;
+            font-size: 1.2rem;
+            margin-top: 20px;
+            width: 200px;
+            outline: none;
+            text-align: center;
+        }
+        button {
+            background: #7bf1a8;
+            color: #2d3436;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 15px;
+            margin-top: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+        button:hover { transform: scale(1.05); background: #fff3b0; }
+        #error { color: #ff6b6b; margin-top: 15px; font-size: 0.9rem; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="lock-box">
+    <h1>LINCOLN'S VAULT</h1>
+    <p>Authorization Required</p>
+    <input type="password" id="passInput" placeholder="Enter Code...">
+    <br>
+    <button onclick="checkAccess()">UNLOCK</button>
+    <p id="error">INCORRECT CODE - ACCESS DENIED</p>
+</div>
+
+<script>
+    function checkAccess() {
+        const code = document.getElementById('passInput').value;
+        // You can change the password below
+        if (code === "EASTER2026") {
+            window.location.href = "game.html";
+        } else {
+            document.getElementById('error').style.display = "block";
+            document.getElementById('passInput').value = "";
+        }
+    }
+
+    document.getElementById("passInput").addEventListener("keyup", (e) => {
+        if (e.key === "Enter") checkAccess();
+    });
+</script>
+
+</body>
+</html>
