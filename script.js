@@ -82,27 +82,70 @@ function spawnGoldenEgg() {
 }
 setInterval(() => { if(Math.random() < 0.3) spawnGoldenEgg(); }, 30000);
 
+// --- UPDATED MYSTERY EGG WITH ANIMATION ---
 function crackMysteryEgg() {
-    if (energy >= mysteryEggCost) {
-        energy -= mysteryEggCost;
-        const roll = Math.random();
-        if (roll < 0.1) {
-            let jackpot = mysteryEggCost * 5;
-            energy += jackpot;
-            alert("JACKPOT! You found a Golden Chick! +" + jackpot + " Eggs");
-        } else if (roll < 0.5) {
-            let prize = mysteryEggCost * 1.5;
-            energy += prize;
-            alert("Sweet! You found some Jelly Beans! +" + Math.floor(prize) + " Eggs");
-        } else {
-            alert("Oh no! It was a hollow egg. Better luck next time!");
-        }
-        mysteryEggCost = Math.ceil(mysteryEggCost * 1.2);
-        document.getElementById('mystery-egg-btn').innerText = `CRACK MYSTERY EGG (Cost: ${mysteryEggCost})`;
-        updateUI();
-    } else {
+    if (energy < mysteryEggCost) {
         alert("Not enough eggs to crack this one!");
+        return;
     }
+
+    // Deduct cost and prep UI
+    energy -= mysteryEggCost;
+    updateUI();
+
+    const btn = document.getElementById('mystery-egg-btn');
+    const container = document.getElementById('egg-animation-container');
+    const egg = document.getElementById('shaking-egg');
+    const prizeDisplay = document.getElementById('egg-prize');
+    
+    // Hide button and show egg
+    btn.style.visibility = 'hidden';
+    container.style.display = 'flex';
+    egg.classList.add('shake-it');
+    egg.classList.remove('cracked');
+    prizeDisplay.innerText = "❓";
+
+    // 1. Shake for 1.5 seconds
+    setTimeout(() => {
+        egg.classList.remove('shake-it');
+        egg.classList.add('cracked');
+
+        // 2. Decide the prize
+        const roll = Math.random();
+        let resultText = "";
+        let reward = 0;
+
+        if (roll < 0.1) {
+            reward = mysteryEggCost * 5;
+            prizeDisplay.innerText = "🐥";
+            resultText = "JACKPOT! You found a Golden Chick!";
+        } else if (roll < 0.5) {
+            reward = mysteryEggCost * 1.5;
+            prizeDisplay.innerText = "🍬";
+            resultText = "Sweet! You found some Jelly Beans!";
+        } else {
+            prizeDisplay.innerText = "💨";
+            resultText = "Oh no! It was a hollow egg.";
+        }
+
+        // 3. Reveal reward
+        setTimeout(() => {
+            if (reward > 0) {
+                energy += reward;
+                showParticle(window.innerWidth/2, window.innerHeight/2, `+${Math.floor(reward)}`);
+            }
+            alert(resultText);
+            
+            // Clean up and reset button
+            container.style.display = 'none';
+            btn.style.visibility = 'visible';
+            mysteryEggCost = Math.ceil(mysteryEggCost * 1.2);
+            btn.innerText = `CRACK MYSTERY EGG (Cost: ${mysteryEggCost})`;
+            updateUI();
+            saveGame();
+        }, 1000);
+
+    }, 1500);
 }
 
 function updateUI() {
