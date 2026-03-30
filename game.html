@@ -31,7 +31,29 @@
         .bg-factory { background-image: linear-gradient(rgba(255,255,255,0.7), rgba(255,255,255,0.7)), url('https://images.unsplash.com/photo-1558961312-30ca048846c8?auto=format&fit=crop&w=1200'); }
         .bg-space { background-image: linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.6)), url('https://images.unsplash.com/photo-1534067783941-51c9c23ecefd?auto=format&fit=crop&w=1200'); }
 
-        #game-wrapper { max-width: 1200px; width: 100%; display: flex; gap: 20px; padding: 20px; box-sizing: border-box; z-index: 1; }
+        #game-wrapper { max-width: 1400px; width: 100%; display: flex; gap: 20px; padding: 20px; box-sizing: border-box; z-index: 1; }
+        
+        /* Update Log Styling */
+        .log-container {
+            flex: 0.8;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 15px;
+            border-radius: 20px;
+            border: 2px solid var(--deep-purple);
+            height: 90vh;
+            overflow-y: auto;
+            font-size: 0.85rem;
+        }
+        .log-entry {
+            background: var(--white);
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 5px solid var(--bubblegum);
+        }
+        .log-entry h4 { margin: 0 0 5px 0; color: var(--deep-purple); }
+        .log-entry ul { margin: 5px 0; padding-left: 20px; }
+
         .left-column { flex: 1; display: flex; flex-direction: column; gap: 20px; }
         .clicker-section { text-align: center; display: flex; flex-direction: column; align-items: center; }
 
@@ -99,6 +121,34 @@
 <body class="bg-kitchen">
 
 <div id="game-wrapper">
+    <div class="log-container">
+        <h2 style="text-align:center; color:var(--deep-purple);">UPDATE LOG</h2>
+        
+        <div class="log-entry">
+            <h4>v1.3 - Security & Secrets</h4>
+            <ul>
+                <li><b>Lock Screen:</b> Added <code>index.html</code> gateway. Uses conditional string matching to verify access before loading game data.</li>
+                <li><b>Mystery Eggs:</b> Risk/Reward mechanic. 10% chance for a 5x payout, 50% chance to lose investment.</li>
+            </ul>
+        </div>
+
+        <div class="log-entry">
+            <h4>v1.2 - The Golden Hunt</h4>
+            <ul>
+                <li><b>Golden Eggs:</b> Random spawn logic. Checks every 30s with a 30% success rate. Gives a percentage-based bonus (15% of current eggs).</li>
+                <li><b>Dynamic Backgrounds:</b> CSS classes now swap based on score thresholds using JavaScript's <code>if/else</code> logic.</li>
+            </ul>
+        </div>
+
+        <div class="log-entry">
+            <h4>v1.1 - Persistence</h4>
+            <ul>
+                <li><b>Local Storage:</b> Game now saves automatically. Uses <code>JSON.stringify</code> to turn game objects into strings for your browser memory.</li>
+                <li><b>Prestige System:</b> Unlock Golden Carrots at 1 Billion eggs to multiply future earnings.</li>
+            </ul>
+        </div>
+    </div>
+
     <div class="left-column">
         <div class="clicker-section">
             <div id="score-panel">
@@ -126,6 +176,7 @@
             </div>
         </div>
     </div>
+    
     <div class="shop-container" id="shop"></div>
 </div>
 
