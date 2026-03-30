@@ -92,20 +92,13 @@
         }
         #global-bar-fill { height: 100%; width: 45%; background: var(--grass); transition: width 0.5s ease; }
 
+        /* FIXED SHOP CONTAINER - Added Flex to prevent squishing */
         .shop-container {
             flex: 1.2; background: rgba(255, 255, 255, 0.4); padding: 15px;
             border-radius: 30px; height: 90vh; overflow-y: auto; border: 2px solid var(--white);
             backdrop-filter: blur(15px);
-        }
-.shop-container {
-            flex: 1.2; 
-            background: rgba(255, 255, 255, 0.4); 
-            padding: 15px;
-            border-radius: 30px; 
-            height: 90vh; 
-            overflow-y: auto; 
-            border: 2px solid var(--white);
-            backdrop-filter: blur(15px);
+            display: flex;
+            flex-direction: column;
         }
 
         .upgrade {
@@ -122,7 +115,8 @@
             margin-bottom: 12px;
             transition: 0.2s ease;
             box-sizing: border-box;
-            min-height: 85px; /* Keeps buttons from squishing */
+            min-height: 85px; 
+            flex-shrink: 0; /* Prevents button height from collapsing */
         }
 
         .can-afford { 
@@ -134,38 +128,44 @@
         .u-info { 
             text-align: left; 
             display: flex;
-            flex-direction: column; /* Stacks name, desc, and cost */
+            flex-direction: column;
             gap: 2px;
         }
 
-        .u-name { 
-            font-weight: bold; 
-            color: var(--deep-purple); 
-            font-size: 1.05rem; 
-            display: block; 
+        .u-name { font-weight: bold; color: var(--deep-purple); font-size: 1.05rem; }
+        .u-desc { font-size: 0.75rem; color: #666; line-height: 1.2; }
+        .u-cost { color: #444; font-size: 0.85rem; font-weight: bold; margin-top: 4px; }
+        .u-count { font-size: 1.8rem; font-weight: bold; color: var(--bubblegum); opacity: 0.8; margin-left: 10px; }
+
+        /* EGG POP-UP PARTICLES STYLING */
+        .particle {
+            position: fixed;
+            pointer-events: none;
+            font-size: 2rem;
+            z-index: 3000;
+            animation: floatUp 0.8s ease-out forwards;
         }
 
-        .u-desc { 
-            font-size: 0.75rem; 
-            color: #666; 
-            display: block; 
-            line-height: 1.2;
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-100px) scale(1.5); opacity: 0; }
         }
 
-        .u-cost { 
-            color: #444; 
-            font-size: 0.85rem; 
-            font-weight: bold; 
-            margin-top: 4px; 
-            display: block; 
+        .golden-egg {
+            position: fixed;
+            width: 50px;
+            height: 70px;
+            background: gold;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            cursor: pointer;
+            z-index: 500;
+            box-shadow: 0 0 20px gold;
+            animation: drift 10s linear forwards;
         }
 
-        .u-count { 
-            font-size: 1.8rem; 
-            font-weight: bold; 
-            color: var(--bubblegum); 
-            opacity: 0.8; 
-            margin-left: 10px;
+        @keyframes drift {
+            from { left: -60px; transform: rotate(0deg); }
+            to { left: 100vw; transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -223,7 +223,7 @@
             
             <button id="mystery-egg-btn" onclick="crackMysteryEgg()">CRACK MYSTERY EGG (Cost: 500)</button>
 
-            <button class="prestige-btn" id="prestige-btn" style="display:none;" onclick="prestige()">BIG REVEAL (WEIGH IN)</button>
+            <button class="prestige-btn" id="prestige-btn" style="display:none; margin-top:10px; padding:10px; background:var(--gold); border:none; border-radius:10px; cursor:pointer;" onclick="prestige()">BIG REVEAL (WEIGH IN)</button>
             <div style="margin-top:20px;">
                 <button onclick="resetGame()" style="background:none; border:none; color:var(--deep-purple); cursor:pointer; font-size: 0.7rem; text-decoration: underline; opacity: 0.5;">Reset Adventure</button>
             </div>
@@ -238,7 +238,6 @@ function toggleLog(show) {
     document.getElementById('log-overlay').style.display = show ? 'flex' : 'none';
 }
 
-// Automatically show the log on the first visit of the session
 if (!sessionStorage.getItem('logSeen')) {
     toggleLog(true);
     sessionStorage.setItem('logSeen', 'true');
@@ -293,7 +292,7 @@ function spawnGoldenEgg() {
         egg.remove();
     };
     document.body.appendChild(egg);
-    setTimeout(() => { if(egg) egg.remove(); }, 10000);
+    setTimeout(() => { if(egg.parentNode) egg.remove(); }, 10000);
 }
 setInterval(() => { if(Math.random() < 0.3) spawnGoldenEgg(); }, 30000);
 
