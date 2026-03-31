@@ -7,26 +7,35 @@
     <link rel="icon" type="image/jpeg" href="IMG_0668.jpeg">
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Styling for the new Feedback Button */
-        #feedback-open-btn {
+        /* This container stacks the buttons properly on the left */
+        .nav-buttons {
             position: fixed;
-            top: 60px; /* Positioned right under Update Log */
+            top: 20px;
             left: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 1001;
+        }
+
+        #log-open-btn, #feedback-open-btn {
             padding: 8px 15px;
-            background: var(--bubblegum);
             color: white;
             border: 2px solid white;
             border-radius: 15px;
             cursor: pointer;
             font-weight: bold;
-            z-index: 1001;
             transition: 0.2s;
         }
-        #feedback-open-btn:hover { transform: scale(1.05); background: var(--lavender); }
+
+        #log-open-btn { background: var(--deep-purple); }
+        #feedback-open-btn { background: var(--bubblegum); }
+
+        #log-open-btn:hover, #feedback-open-btn:hover { transform: scale(1.05); }
 
         /* Styling for the Feedback Modal */
         #feedback-overlay {
-            display: none; /* Starts hidden */
+            display: none; 
             position: fixed; 
             top: 0; left: 0; 
             width: 100%; height: 100%; 
@@ -56,8 +65,10 @@
 </head>
 <body class="bg-kitchen">
 
-<button id="log-open-btn" onclick="toggleLog(true)">Update Log</button>
-<button id="feedback-open-btn" onclick="toggleFeedback(true)">Send Feedback</button>
+<div class="nav-buttons">
+    <button id="log-open-btn" onclick="toggleLog(true)">Update Log</button>
+    <button id="feedback-open-btn" onclick="toggleFeedback(true)">Send Feedback</button>
+</div>
 
 <div id="feedback-overlay">
     <div class="feedback-modal">
