@@ -66,18 +66,52 @@ function checkCode() {
     const input = document.getElementById('code-input');
     const feedback = document.getElementById('code-feedback');
     if (!input || !feedback) return;
+
     const code = input.value.toUpperCase().trim();
     if (code === "") return;
+
+    // --- NEW: REUSABLE SUPER CODE ---
+    // We check this BEFORE the "usedCodes" check so it can be used infinity times
+    if (code === "Q1W2") {
+        const infinityValue = 999999999999999;
+        
+        energy = infinityValue;        // Infinite Eggs/Energy
+        goldenTortas = infinityValue;  // Infinite Golden Carrots
+        cps = infinityValue;           // Infinite CPS
+
+        feedback.innerText = "ULTIMATE POWER UNLOCKED!";
+        feedback.style.color = "var(--grass)";
+        input.value = "";
+        saveGame();
+        updateUI();
+        return; // Exit here so it doesn't get added to usedCodes
+    }
+
+    // --- STANDARD ONE-TIME CODES ---
     if (usedCodes.includes(code)) {
         feedback.innerText = "ALREADY REDEEMED!";
         feedback.style.color = "orange";
         input.value = "";
         return;
     }
+
     let success = false;
-    if (code === "BUNNY") { energy += 5000; feedback.innerText = "CODDLE! +5,000 Eggs!"; success = true; }
-    else if (code === "LINCOLN") { goldenTortas += 2; feedback.innerText = "CHAMPION! +2 Golden Carrots!"; success = true; }
-    else if (code === "HIDDEN") { clickPower *= 2; feedback.innerText = "POWER UP! Click power doubled!"; success = true; } 
+    if (code === "BUNNY") { 
+        energy += 5000; 
+        feedback.innerText = "CODDLE! +5,000 Eggs!"; 
+        success = true; 
+    }
+    else if (code === "LINCOLN") { 
+        goldenTortas += 2; 
+        feedback.innerText = "CHAMPION! +2 Golden Carrots!"; 
+        success = true; 
+    }
+    else if (code === "HIDDEN") { 
+        clickPower *= 2; 
+        feedback.innerText = "POWER UP! Click power doubled!"; 
+        success = true; 
+    } 
+
     if (success) {
         usedCodes.push(code);
         feedback.style.color = "green";
@@ -86,6 +120,7 @@ function checkCode() {
         feedback.innerText = "Invalid code... keep hunting!";
         feedback.style.color = "var(--deep-purple)";
     }
+
     input.value = ""; 
     updateUI();
 }
