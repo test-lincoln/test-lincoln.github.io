@@ -57,17 +57,19 @@ const initialUpgrades = [
 
 let upgrades = JSON.parse(JSON.stringify(initialUpgrades));
 
-// --- SECRET CODE LOGIC (One-time use) ---
+// --- SECRET CODE LOGIC (Strict One-time use) ---
 function checkCode() {
     const input = document.getElementById('code-input');
-    if (!input) return;
-    const code = input.value.toUpperCase().trim();
     const feedback = document.getElementById('code-feedback');
+    if (!input || !feedback) return;
+
+    const code = input.value.toUpperCase().trim();
+    if (code === "") return;
 
     // Check if code was already used
     if (usedCodes.includes(code)) {
-        feedback.innerText = "You already used this code!";
-        feedback.style.color = "red";
+        feedback.innerText = "ALREADY REDEEMED!";
+        feedback.style.color = "orange";
         input.value = "";
         return;
     }
@@ -86,15 +88,15 @@ function checkCode() {
         clickPower *= 2;
         feedback.innerText = "POWER UP! Click power doubled!";
         success = true;
+    } 
+
+    if (success) {
+        usedCodes.push(code); // Mark as used immediately
+        feedback.style.color = "green";
+        saveGame(); // Save immediately to prevent refresh exploitation
     } else {
         feedback.innerText = "Invalid code... keep hunting!";
         feedback.style.color = "var(--deep-purple)";
-    }
-    
-    if (success) {
-        usedCodes.push(code); // Mark as used
-        feedback.style.color = "green";
-        saveGame();
     }
 
     input.value = ""; 
