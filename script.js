@@ -53,7 +53,6 @@ function checkTacoTuesday() {
     const now = new Date();
     const isTuesday = now.getDay() === 2; 
     const feedback = document.getElementById('code-feedback');
-    const label = document.getElementById('env-label');
     const root = document.documentElement;
 
     if (isTuesday) {
@@ -72,13 +71,12 @@ function checkTacoTuesday() {
         }
     } else {
         eventMultiplier = 1;
-        // RESET TO DEFAULT (Assuming your original CSS variables)
+        // RESET TO DEFAULT
         root.style.setProperty('--lavender', '#E6E6FA');
         root.style.setProperty('--deep-purple', '#4B0082');
         root.style.setProperty('--soft-pink', '#FFB6C1');
         root.style.setProperty('--grass', '#7CFC00');
         root.style.setProperty('--sunshine', '#FFD700');
-        if (label) label.style.color = "";
     }
 }
 
@@ -284,16 +282,23 @@ function updateUI() {
 
     const body = document.body; 
     const label = document.getElementById('env-label');
+    
     if (label) {
         if (eventMultiplier > 1) {
-            body.className = 'bg-taco'; // Special class for Taco Tuesday
-            label.innerText = "EVENT: LINCOLN'S TACO FIESTA";
-            label.style.color = "#e7af00";
-            // Dynamically set background pattern if CSS class isn't in your style tag
+            // TACO TUESDAY BACKGROUND INJECTION
+            body.className = 'bg-taco'; 
+            label.innerText = "🌮 EVENT: TACO TUESDAY FIESTA 🌮";
+            label.style.color = "#c91919";
+            
+            // This is the Taco Specific Background logic
             body.style.backgroundColor = "#f6c95c";
-            body.style.backgroundImage = "url('https://www.transparenttextures.com/patterns/food.png')";
+            // Use a SVG Data URI for a reliable taco-pattern background
+            body.style.backgroundImage = `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext y='35' font-size='30'%3E🌮%3C/text%3E%3C/svg%3E")`;
+            body.style.backgroundRepeat = "repeat";
         } else {
+            // NORMAL BACKGROUNDS
             body.style.backgroundImage = "";
+            body.style.backgroundColor = ""; 
             if (energy < 100000) { body.className = 'bg-kitchen'; label.innerText = "LOCATION: THE GARDEN GATE"; }
             else if (energy < 10000000) { body.className = 'bg-buffet'; label.innerText = "LOCATION: BLOOMING FLOWERBEDS"; }
             else if (energy < 50000000) { body.className = 'bg-factory'; label.innerText = "LOCATION: CANDY WORKSHOP"; }
