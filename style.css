@@ -64,22 +64,61 @@ body {
 
 #score-text { font-size: 3.5rem; color: var(--deep-purple); margin: 0; line-height: 1.2; text-shadow: 2px 2px var(--sunshine); }
 
+/* --- CHARACTER & HAT OVERLAY SYSTEM --- */
+.img-container {
+    position: relative;
+    display: inline-block;
+    margin-top: 10px;
+}
+
 #lincoln-main {
     width: 280px; height: 280px; border-radius: 50%; cursor: pointer;
     object-fit: cover; border: 8px solid var(--white);
     box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-    transition: transform 0.05s, filter 0.3s; user-select: none; margin-top: 10px;
+    transition: transform 0.05s, filter 0.3s; user-select: none;
+    position: relative;
+    z-index: 1;
 }
 #lincoln-main:active { transform: scale(0.96); }
 
-/* --- WARDROBE VISUAL EFFECTS --- */
-.hat-tophat { filter: sepia(0.5) contrast(1.2); border-color: #444 !important; }
-.hat-bunnyears { border-color: var(--bubblegum) !important; filter: hue-rotate(330deg); }
-.hat-propeller { border-color: var(--gold) !important; animation: propeller-glow 2s infinite alternate; }
+/* Hat Visual Bases */
+.img-container::after {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    pointer-events: none;
+    transition: 0.3s all cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    font-size: 0px;
+    content: "";
+}
 
-@keyframes propeller-glow {
-    from { box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
-    to { box-shadow: 0 0 40px var(--gold); }
+/* Specific Hat Visuals */
+.hat-tophat #lincoln-main { border-color: #444 !important; }
+.hat-tophat::after {
+    content: "🎩";
+    font-size: 100px;
+    top: -50px;
+}
+
+.hat-bunnyears #lincoln-main { border-color: var(--bubblegum) !important; }
+.hat-bunnyears::after {
+    content: "🐰";
+    font-size: 110px;
+    top: -60px;
+}
+
+.hat-propeller #lincoln-main { border-color: var(--gold) !important; }
+.hat-propeller::after {
+    content: "🚁";
+    font-size: 100px;
+    top: -55px;
+    animation: propeller-spin 0.5s infinite linear;
+}
+
+@keyframes propeller-spin {
+    from { transform: translateX(-50%) rotateY(0deg); }
+    to { transform: translateX(-50%) rotateY(360deg); }
 }
 
 #mystery-egg-btn {
@@ -102,7 +141,7 @@ body {
     flex-direction: column;
 }
 
-/* Updated Upgrade UI for better balance feedback */
+/* Upgrade UI */
 .upgrade {
     width: 100%; 
     background: var(--white); 
@@ -121,7 +160,6 @@ body {
     flex-shrink: 0;
 }
 
-/* Highlighted when you can afford the new prices */
 .can-afford { 
     border-color: var(--grass) !important; 
     background: var(--sunshine); 
@@ -171,8 +209,7 @@ body {
     to { left: 100vw; transform: rotate(360deg); }
 }
 
-/* --- FIXED MYSTERY EGG ANIMATION --- */
-
+/* MYSTERY EGG ANIMATION */
 #egg-animation-container {
     height: 180px;
     width: 100px;
