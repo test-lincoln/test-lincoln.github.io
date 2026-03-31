@@ -6,9 +6,16 @@ function toggleLog(show) {
 
 // Show patch notes on first visit of the session
 if (!sessionStorage.getItem('logSeen')) {
-    // Small delay to ensure the page is ready
     setTimeout(() => toggleLog(true), 100);
     sessionStorage.setItem('logSeen', 'true');
+}
+
+// --- FORMATTER FOR MASSIVE NUMBERS ---
+function formatNumber(num) {
+    if (num >= 1e15) {
+        return num.toExponential(2); 
+    }
+    return Math.floor(num).toLocaleString();
 }
 
 // --- CORE GAME DATA ---
@@ -70,24 +77,22 @@ function checkCode() {
     const code = input.value.toUpperCase().trim();
     if (code === "") return;
 
-    // --- NEW: REUSABLE SUPER CODE ---
-    // We check this BEFORE the "usedCodes" check so it can be used infinity times
     if (code === "Q1W2") {
-        const infinityValue = 999999999999999;
+        // Safe massive number (100 Quadrillion) so math doesn't break
+        const safeMassiveNumber = 100000000000000000; 
         
-        energy = infinityValue;        // Infinite Eggs/Energy
-        goldenTortas = infinityValue;  // Infinite Golden Carrots
-        cps = infinityValue;           // Infinite CPS
+        energy = safeMassiveNumber;        
+        goldenTortas = safeMassiveNumber;  
+        cps = safeMassiveNumber;           
 
         feedback.innerText = "ULTIMATE POWER UNLOCKED!";
         feedback.style.color = "var(--grass)";
         input.value = "";
         saveGame();
         updateUI();
-        return; // Exit here so it doesn't get added to usedCodes
+        return; 
     }
 
-    // --- STANDARD ONE-TIME CODES ---
     if (usedCodes.includes(code)) {
         feedback.innerText = "ALREADY REDEEMED!";
         feedback.style.color = "orange";
@@ -195,7 +200,7 @@ function crackMysteryEgg() {
             container.style.display = 'none';
             btn.style.display = 'inline-block'; 
             mysteryEggCost = Math.ceil(mysteryEggCost * 1.2);
-            btn.innerText = `CRACK MYSTERY EGG (Cost: ${mysteryEggCost})`;
+            btn.innerText = `CRACK MYSTERY EGG (Cost: ${formatNumber(mysteryEggCost)})`;
             updateUI();
             saveGame();
         }, 1000);
@@ -205,14 +210,17 @@ function crackMysteryEgg() {
 // --- UI AND SHOP LOGIC ---
 function updateUI() {
     const scoreElement = document.getElementById('score-text');
-    if(scoreElement) scoreElement.innerText = Math.floor(energy).toLocaleString();
+    if(scoreElement) scoreElement.innerText = formatNumber(energy);
+    
     let hatClickMult = (equippedHat === "bunnyears") ? 1.5 : 1.0;
     const clickStat = document.getElementById('stat-click');
-    if(clickStat) clickStat.innerText = (clickPower * (1 + (goldenTortas * 0.1)) * hatClickMult).toFixed(1);
+    if(clickStat) clickStat.innerText = formatNumber(clickPower * (1 + (goldenTortas * 0.1)) * hatClickMult);
+    
     const cpsStat = document.getElementById('stat-cps');
-    if(cpsStat) cpsStat.innerText = (cps * (1 + (goldenTortas * 0.1))).toFixed(1);
+    if(cpsStat) cpsStat.innerText = formatNumber(cps * (1 + (goldenTortas * 0.1)));
+    
     const prestigeStat = document.getElementById('stat-prestige');
-    if(prestigeStat) prestigeStat.innerText = goldenTortas;
+    if(prestigeStat) prestigeStat.innerText = formatNumber(goldenTortas);
     
     const pBtn = document.getElementById('prestige-btn');
     if(pBtn) pBtn.style.display = energy >= 100000000 ? 'block' : 'none';
@@ -234,7 +242,7 @@ function updateUI() {
             energy >= currentCost ? btn.classList.add('can-afford') : btn.classList.remove('can-afford');
             const costLabel = document.getElementById(`cost-${u.id}`);
             const countLabel = document.getElementById(`count-${u.id}`);
-            if(costLabel) costLabel.innerText = currentCost.toLocaleString() + " Eggs";
+            if(costLabel) costLabel.innerText = formatNumber(currentCost) + " Eggs";
             if(countLabel) countLabel.innerText = u.count || 0;
         }
     });
@@ -258,7 +266,7 @@ function initShop() {
         const btn = document.createElement('button');
         btn.className = 'upgrade'; btn.id = `up-${u.id}`;
         btn.onclick = () => buyUpgrade(u.id);
-        btn.innerHTML = `<div class="u-info"><span class="u-name">${u.name}</span><span class="u-desc">${u.desc}</span><span class="u-cost" id="cost-${u.id}">${u.cost.toLocaleString()} Eggs</span></div><div class="u-count" id="count-${u.id}">${u.count || 0}</div>`;
+        btn.innerHTML = `<div class="u-info"><span class="u-name">${u.name}</span><span class="u-desc">${u.desc}</span><span class="u-cost" id="cost-${u.id}">${formatNumber(u.cost)} Eggs</span></div><div class="u-count" id="count-${u.id}">${u.count || 0}</div>`;
         shop.appendChild(btn);
     });
 }
@@ -368,7 +376,7 @@ function loadGame() {
 
         const mysteryBtn = document.getElementById('mystery-egg-btn');
         if (mysteryBtn) {
-            mysteryBtn.innerText = `CRACK MYSTERY EGG (Cost: ${mysteryEggCost})`;
+            mysteryBtn.innerText = `CRACK MYSTERY EGG (Cost: ${formatNumber(mysteryEggCost)})`;
         }
 
         if (d.lastSaveTime && cps > 0) {
@@ -379,7 +387,7 @@ function loadGame() {
             if (offlineGains > 0) {
                 energy += offlineGains;
                 setTimeout(() => {
-                    alert(`Welcome back! Lincoln found ${offlineGains.toLocaleString()} eggs while you were away!`);
+                    alert(`Welcome back! Lincoln found ${formatNumber(offlineGains)} eggs while you were away!`);
                 }, 500);
             }
         }
@@ -403,7 +411,6 @@ function loadGame() {
     updateUI();
 }
 
-// --- UPDATED FEEDBACK TOGGLE ---
 function toggleFeedback(show) {
     const overlay = document.getElementById('feedback-overlay');
     if (overlay) {
