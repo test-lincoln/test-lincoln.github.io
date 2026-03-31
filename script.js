@@ -15,7 +15,6 @@ let mysteryEggCost = 500;
 let equippedHat = "none"; 
 
 // --- WARDROBE DATA ---
-// Added 'owned' property to track permanent unlocks
 const hats = [
     { id: 'none', name: 'No Hat', cost: 0, owned: true, buff: 1, type: 'none', desc: 'Just regular Lincoln.' },
     { id: 'tophat', name: 'Top Hat', cost: 5, owned: false, buff: 0.90, type: 'discount', desc: 'Classy! Shop items cost 10% less.' },
@@ -215,7 +214,7 @@ function initWardrobe() {
     hats.forEach(h => {
         const btn = document.createElement('button');
         btn.id = `hat-btn-${h.id}`;
-        btn.style.cssText = "min-width: 80px; padding: 10px; border-radius: 12px; border: 2px solid var(--lavender); cursor: pointer; font-size: 0.75rem; font-weight: bold; transition: 0.2s;";
+        btn.style.cssText = "min-width: 100px; padding: 12px; border-radius: 12px; border: 2px solid var(--lavender); cursor: pointer; font-size: 0.75rem; font-weight: bold; transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center;";
         btn.onclick = () => handleHatAction(h);
         list.appendChild(btn);
     });
@@ -226,20 +225,29 @@ function refreshWardrobeUI() {
     hats.forEach(h => {
         const btn = document.getElementById(`hat-btn-${h.id}`);
         if (!btn) return;
+        
+        let statusText = "";
         if (equippedHat === h.id) {
             btn.style.borderColor = "var(--grass)";
             btn.style.background = "var(--sunshine)";
-            btn.innerText = `[${h.name}]`;
+            statusText = `[EQUIPPED]`;
         } else if (h.owned) {
             btn.style.background = "white";
             btn.style.borderColor = "var(--lavender)";
-            btn.innerText = `Equip ${h.name}`;
+            statusText = `EQUIP`;
             btn.style.opacity = "1";
         } else {
             btn.style.background = "#f0f0f0";
-            btn.innerText = h.cost > 0 ? `${h.name} (${h.cost}🥕)` : h.name;
+            statusText = h.cost > 0 ? `BUY (${h.cost}🥕)` : "FREE";
             btn.style.opacity = (goldenTortas >= h.cost) ? "1" : "0.5";
         }
+
+        // Added Multiplier Info to HTML inside the button
+        btn.innerHTML = `
+            <span style="font-size: 0.85rem; color: var(--deep-purple);">${h.name}</span>
+            <span style="font-size: 0.65rem; color: #666; font-weight: normal;">${h.desc}</span>
+            <span style="margin-top: 4px;">${statusText}</span>
+        `;
     });
 }
 
@@ -264,7 +272,6 @@ function handleHatAction(hat) {
 }
 
 function applyHatVisuals() {
-    // Targets the container to allow CSS ::after overlays
     const container = document.querySelector('.img-container');
     if (!container) return;
     hats.forEach(h => container.classList.remove(`hat-${h.id}`));
