@@ -1,10 +1,26 @@
+// --- AUDIO ENGINE ---
+const tacoMusic = new Audio('https://www.soundboard.com/handler/DownLoadTrack.ashx?cliptitle=Raining+Tacos&filename=24/248103-68d80c05-7763-487b-839c-5353063546a9.mp3');
+tacoMusic.loop = true;
+tacoMusic.volume = 0.5;
+
+function handleTacoMusic() {
+    const isTuesday = new Date().getDay() === 2;
+    if (isTuesday) {
+        if (tacoMusic.paused) {
+            tacoMusic.play().catch(e => console.log("Music waiting for first click..."));
+        }
+    } else {
+        tacoMusic.pause();
+        tacoMusic.currentTime = 0;
+    }
+}
+
 // --- LOG POP-UP LOGIC ---
 function toggleLog(show) {
     const overlay = document.getElementById('log-overlay');
     if (overlay) overlay.style.display = show ? 'flex' : 'none';
 }
 
-// Show patch notes on first visit of the session
 if (!sessionStorage.getItem('logSeen')) {
     setTimeout(() => toggleLog(true), 100);
     sessionStorage.setItem('logSeen', 'true');
@@ -24,7 +40,7 @@ let energy = 0, clickPower = 1, cps = 0, goldenTortas = 0;
 let mysteryEggCost = 500;
 let equippedHat = "none"; 
 let usedCodes = []; 
-let eventMultiplier = 1; // Taco Tuesday Multiplier
+let eventMultiplier = 1;
 
 // --- WARDROBE DATA ---
 const hats = [
@@ -57,26 +73,25 @@ function checkTacoTuesday() {
 
     if (isTuesday) {
         eventMultiplier = 5;
-        
-        // APPLY TACO COLORS
-        root.style.setProperty('--lavender', '#f6c95c'); // Shell Yellow
-        root.style.setProperty('--deep-purple', '#983d00'); // Meat Brown
-        root.style.setProperty('--soft-pink', '#41a332'); // Lettuce Green
-        root.style.setProperty('--grass', '#c91919'); // Tomato Red
-        root.style.setProperty('--sunshine', '#e7af00'); // Cheese Gold
+        root.style.setProperty('--lavender', '#f6c95c');
+        root.style.setProperty('--deep-purple', '#983d00');
+        root.style.setProperty('--soft-pink', '#41a332');
+        root.style.setProperty('--grass', '#c91919');
+        root.style.setProperty('--sunshine', '#e7af00');
 
         if (feedback) {
             feedback.innerText = "🌮 TACO TUESDAY ACTIVE! 5x CLICKS! 🌮";
             feedback.style.color = "#c91919";
         }
+        handleTacoMusic(); // Trigger music check
     } else {
         eventMultiplier = 1;
-        // RESET TO DEFAULT
         root.style.setProperty('--lavender', '#E6E6FA');
         root.style.setProperty('--deep-purple', '#4B0082');
         root.style.setProperty('--soft-pink', '#FFB6C1');
         root.style.setProperty('--grass', '#7CFC00');
         root.style.setProperty('--sunshine', '#FFD700');
+        tacoMusic.pause();
     }
 }
 
@@ -120,28 +135,20 @@ function checkCode() {
     const input = document.getElementById('code-input');
     const feedback = document.getElementById('code-feedback');
     if (!input || !feedback) return;
-
     const code = input.value.toUpperCase().trim();
     if (code === "") return;
 
     if (code === "DEV9") {
-        const safeMassiveNumber = 100000000000000000; 
-        energy = safeMassiveNumber;        
-        goldenTortas = safeMassiveNumber;  
-        cps = safeMassiveNumber;           
+        energy = 1e17; goldenTortas = 1e17; cps = 1e17;
         feedback.innerText = "ULTIMATE POWER UNLOCKED!";
         feedback.style.color = "var(--grass)";
-        input.value = "";
-        saveGame();
-        updateUI();
-        return; 
+        input.value = ""; saveGame(); updateUI(); return; 
     }
 
     if (usedCodes.includes(code)) {
         feedback.innerText = "ALREADY REDEEMED!";
         feedback.style.color = "orange";
-        input.value = "";
-        return;
+        input.value = ""; return;
     }
 
     let success = false;
@@ -157,12 +164,12 @@ function checkCode() {
         feedback.innerText = "Invalid code... keep hunting!";
         feedback.style.color = "var(--deep-purple)";
     }
-    input.value = ""; 
-    updateUI();
+    input.value = ""; updateUI();
 }
 
 // --- CLICK LOGIC ---
 document.getElementById('lincoln-main').addEventListener('click', (e) => {
+    handleTacoMusic(); // Start music on first click if Tuesday
     let hatBonus = (equippedHat === "bunnyears") ? 1.5 : 1.0;
     let val = clickPower * (1 + (goldenTortas * 0.1)) * hatBonus * eventMultiplier; 
     energy += val;
@@ -256,7 +263,7 @@ function updateUI() {
     if(prestigeStat) prestigeStat.innerText = formatNumber(goldenTortas);
     
     const pBtn = document.getElementById('prestige-btn');
-    if(pBtn) pBtn.style.display = energy >= 100000000 ? 'block' : 'none';
+    if(pBtn) pBtn.style.display = energy >= 1e8 ? 'block' : 'none';
     
     const huntPercent = getHuntProgress();
     const fill = document.getElementById('global-bar-fill');
@@ -285,23 +292,18 @@ function updateUI() {
     
     if (label) {
         if (eventMultiplier > 1) {
-            // TACO TUESDAY BACKGROUND INJECTION
             body.className = 'bg-taco'; 
             label.innerText = "🌮 EVENT: TACO TUESDAY FIESTA 🌮";
             label.style.color = "#c91919";
-            
-            // This is the Taco Specific Background logic
             body.style.backgroundColor = "#f6c95c";
-            // Use a SVG Data URI for a reliable taco-pattern background
             body.style.backgroundImage = `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext y='35' font-size='30'%3E🌮%3C/text%3E%3C/svg%3E")`;
             body.style.backgroundRepeat = "repeat";
         } else {
-            // NORMAL BACKGROUNDS
             body.style.backgroundImage = "";
             body.style.backgroundColor = ""; 
             if (energy < 100000) { body.className = 'bg-kitchen'; label.innerText = "LOCATION: THE GARDEN GATE"; }
-            else if (energy < 10000000) { body.className = 'bg-buffet'; label.innerText = "LOCATION: BLOOMING FLOWERBEDS"; }
-            else if (energy < 50000000) { body.className = 'bg-factory'; label.innerText = "LOCATION: CANDY WORKSHOP"; }
+            else if (energy < 1e7) { body.className = 'bg-buffet'; label.innerText = "LOCATION: BLOOMING FLOWERBEDS"; }
+            else if (energy < 5e7) { body.className = 'bg-factory'; label.innerText = "LOCATION: CANDY WORKSHOP"; }
             else { body.className = 'bg-space'; label.innerText = "LOCATION: THE GREAT EGG NEBULA"; }
         }
     }
@@ -375,19 +377,16 @@ function buyUpgrade(id) {
         u.count = (u.count || 0) + 1;
         if (u.type === "click") clickPower += u.power; else cps += u.power;
         u.cost = Math.ceil(u.cost * 1.15);
-        updateUI();
-        saveGame();
+        updateUI(); saveGame();
     }
 }
 
 function prestige() {
-    if (energy < 100000000) return;
-    const bonus = Math.floor(Math.pow(energy / 100000000, 0.5)) + 1;
+    if (energy < 1e8) return;
+    const bonus = Math.floor(Math.pow(energy / 1e8, 0.5)) + 1;
     if (confirm(`Find ${bonus} Golden Carrots?`)) {
         goldenTortas += bonus; 
         energy = 0; clickPower = 1; cps = 0; mysteryEggCost = 500; 
-        const mysteryBtn = document.getElementById('mystery-egg-btn');
-        if (mysteryBtn) mysteryBtn.innerText = `CRACK MYSTERY EGG (Cost: 500)`;
         upgrades = JSON.parse(JSON.stringify(initialUpgrades));
         initShop(); saveGame(); updateUI();
     }
@@ -412,16 +411,12 @@ function loadGame() {
         energy = d.energy || 0; clickPower = d.clickPower || 1; cps = d.cps || 0;
         goldenTortas = d.goldenTortas || 0; mysteryEggCost = d.mysteryEggCost || 500; 
         equippedHat = d.equippedHat || "none"; usedCodes = d.usedCodes || [];
-        const mysteryBtn = document.getElementById('mystery-egg-btn');
-        if (mysteryBtn) mysteryBtn.innerText = `CRACK MYSTERY EGG (Cost: ${formatNumber(mysteryEggCost)})`;
         if (d.lastSaveTime && cps > 0) {
-            const now = Date.now();
-            const diffSeconds = (now - d.lastSaveTime) / 1000;
-            const boostedCPS = cps * (1 + (goldenTortas * 0.1));
-            const offlineGains = Math.floor(boostedCPS * 0.5 * diffSeconds); 
+            const diffSeconds = (Date.now() - d.lastSaveTime) / 1000;
+            const offlineGains = Math.floor(cps * (1 + (goldenTortas * 0.1)) * 0.5 * diffSeconds); 
             if (offlineGains > 0) {
                 energy += offlineGains;
-                setTimeout(() => alert(`Welcome back! Lincoln found ${formatNumber(offlineGains)} eggs while you were away!`), 500);
+                setTimeout(() => alert(`Welcome back! Lincoln found ${formatNumber(offlineGains)} eggs!`), 500);
             }
         }
         if (d.ownedHats) d.ownedHats.forEach(id => { const hat = hats.find(h => h.id === id); if (hat) hat.owned = true; });
@@ -431,19 +426,6 @@ function loadGame() {
         });
     }
     initShop(); initWardrobe(); applyHatVisuals(); updateUI();
-}
-
-function toggleFeedback(show) {
-    const overlay = document.getElementById('feedback-overlay');
-    if (overlay) overlay.style.display = show ? 'flex' : 'none';
-}
-
-function resetGame() { 
-    if (confirm("Wipe all progress?")) { 
-        localStorage.removeItem(SAVE_KEY); 
-        mysteryEggCost = 500; 
-        location.reload(); 
-    } 
 }
 
 loadGame();
