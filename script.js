@@ -316,16 +316,22 @@ function loadGame() {
         clickPower = d.clickPower || 1; 
         cps = d.cps || 0;
         goldenTortas = d.goldenTortas || 0; 
-        mysteryEggCost = d.mysteryEggCost || 500;
+        mysteryEggCost = d.mysteryEggCost || 500; // Loads the saved price
         equippedHat = d.equippedHat || "none"; 
         usedCodes = d.usedCodes || [];
+
+        // Update the Mystery Egg button text immediately
+        const mysteryBtn = document.getElementById('mystery-egg-btn');
+        if (mysteryBtn) {
+            mysteryBtn.innerText = `CRACK MYSTERY EGG (Cost: ${mysteryEggCost})`;
+        }
 
         // --- OFFLINE GAINS MATH ---
         if (d.lastSaveTime && cps > 0) {
             const now = Date.now();
             const diffSeconds = (now - d.lastSaveTime) / 1000;
             const boostedCPS = cps * (1 + (goldenTortas * 0.1));
-            const offlineGains = Math.floor(boostedCPS * 0.5 * diffSeconds); // 50% rate
+            const offlineGains = Math.floor(boostedCPS * 0.5 * diffSeconds); 
             if (offlineGains > 0) {
                 energy += offlineGains;
                 setTimeout(() => {
@@ -334,10 +340,23 @@ function loadGame() {
             }
         }
 
-        if (d.ownedHats) d.ownedHats.forEach(id => { const hat = hats.find(h => h.id === id); if (hat) hat.owned = true; });
-        if (d.upgrades) d.upgrades.forEach(savedU => { const currentU = upgrades.find(u => u.id === savedU.id); if (currentU) { currentU.count = savedU.count; currentU.cost = savedU.cost; } });
+        if (d.ownedHats) d.ownedHats.forEach(id => { 
+            const hat = hats.find(h => h.id === id); 
+            if (hat) hat.owned = true; 
+        });
+        
+        if (d.upgrades) d.upgrades.forEach(savedU => { 
+            const currentU = upgrades.find(u => u.id === savedU.id); 
+            if (currentU) { 
+                currentU.count = savedU.count; 
+                currentU.cost = savedU.cost; 
+            } 
+        });
     }
-    initShop(); initWardrobe(); applyHatVisuals(); updateUI();
+    initShop(); 
+    initWardrobe(); 
+    applyHatVisuals(); 
+    updateUI();
 }
 
 function resetGame() { if (confirm("Wipe all progress?")) { localStorage.removeItem(SAVE_KEY); location.reload(); } }
