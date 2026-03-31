@@ -10,7 +10,7 @@ if (!sessionStorage.getItem('logSeen')) {
 
 // --- CORE GAME DATA ---
 const SAVE_KEY = "lincoln_ultimate_save"; 
-let energy = 50, clickPower = 1, cps = 0, goldenTortas = 0;
+let energy = 9999999999, clickPower = 1, cps = 0, goldenTortas = 999;
 let mysteryEggCost = 500;
 let equippedHat = "none"; 
 
