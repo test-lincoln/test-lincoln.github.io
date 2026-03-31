@@ -7,15 +7,16 @@
     <link rel="icon" type="image/jpeg" href="IMG_0668.jpeg">
     <link rel="stylesheet" href="style.css">
     <style>
-        /* This container stacks the buttons properly on the left */
+        /* Container moved to the top right to stack buttons vertically */
         .nav-buttons {
             position: fixed;
             top: 20px;
-            left: 20px;
+            right: 20px; /* Moved to right side */
             display: flex;
             flex-direction: column;
             gap: 10px;
             z-index: 1001;
+            align-items: flex-end; /* Aligns buttons to the right edge */
         }
 
         #log-open-btn, #feedback-open-btn {
@@ -26,6 +27,7 @@
             cursor: pointer;
             font-weight: bold;
             transition: 0.2s;
+            width: fit-content;
         }
 
         #log-open-btn { background: var(--deep-purple); }
