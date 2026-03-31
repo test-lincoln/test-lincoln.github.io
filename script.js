@@ -24,6 +24,7 @@ let energy = 0, clickPower = 1, cps = 0, goldenTortas = 0;
 let mysteryEggCost = 500;
 let equippedHat = "none"; 
 let usedCodes = []; 
+let eventMultiplier = 1; // Taco Tuesday Multiplier
 
 // --- WARDROBE DATA ---
 const hats = [
@@ -46,6 +47,40 @@ function getHuntProgress() {
     if (percent > 100) percent = 100;
     return Math.floor(percent);
 }
+
+// --- TACO TUESDAY LOGIC ---
+function checkTacoTuesday() {
+    const now = new Date();
+    const isTuesday = now.getDay() === 2; 
+    const feedback = document.getElementById('code-feedback');
+    const label = document.getElementById('env-label');
+
+    if (isTuesday) {
+        eventMultiplier = 5;
+        if (feedback) {
+            feedback.innerText = "🌮 TACO TUESDAY ACTIVE! 5x CLICKS! 🌮";
+            feedback.style.color = "orange";
+        }
+        if (label) label.style.color = "#ffcc00";
+    } else {
+        eventMultiplier = 1;
+        if (label) label.style.color = "";
+    }
+}
+
+function createFallingTaco() {
+    if (new Date().getDay() !== 2) return;
+    const taco = document.createElement('div');
+    taco.innerText = "🌮";
+    taco.style.cssText = `position:fixed; top:-50px; left:${Math.random()*100}vw; font-size:${Math.random()*20+20}px; z-index:9999; pointer-events:none; transition:transform 3s linear, opacity 3s linear;`;
+    document.body.appendChild(taco);
+    setTimeout(() => {
+        taco.style.transform = `translateY(${window.innerHeight + 100}px) rotate(${Math.random()*360}deg)`;
+        taco.style.opacity = '0';
+    }, 100);
+    setTimeout(() => taco.remove(), 4000);
+}
+setInterval(createFallingTaco, 400);
 
 // --- REBALANCED UPGRADES ---
 const initialUpgrades = [
@@ -78,13 +113,10 @@ function checkCode() {
     if (code === "") return;
 
     if (code === "DEV9") {
-        // Safe massive number (100 Quadrillion) so math doesn't break
         const safeMassiveNumber = 100000000000000000; 
-        
         energy = safeMassiveNumber;        
         goldenTortas = safeMassiveNumber;  
         cps = safeMassiveNumber;           
-
         feedback.innerText = "ULTIMATE POWER UNLOCKED!";
         feedback.style.color = "var(--grass)";
         input.value = "";
@@ -101,21 +133,9 @@ function checkCode() {
     }
 
     let success = false;
-    if (code === "BUNNY") { 
-        energy += 5000; 
-        feedback.innerText = "CODDLE! +5,000 Eggs!"; 
-        success = true; 
-    }
-    else if (code === "LINCOLN") { 
-        goldenTortas += 2; 
-        feedback.innerText = "CHAMPION! +2 Golden Carrots!"; 
-        success = true; 
-    }
-    else if (code === "HIDDEN") { 
-        clickPower *= 2; 
-        feedback.innerText = "POWER UP! Click power doubled!"; 
-        success = true; 
-    } 
+    if (code === "BUNNY") { energy += 5000; feedback.innerText = "CODDLE! +5,000 Eggs!"; success = true; }
+    else if (code === "LINCOLN") { goldenTortas += 2; feedback.innerText = "CHAMPION! +2 Golden Carrots!"; success = true; }
+    else if (code === "HIDDEN") { clickPower *= 2; feedback.innerText = "POWER UP! Click power doubled!"; success = true; } 
 
     if (success) {
         usedCodes.push(code);
@@ -125,7 +145,6 @@ function checkCode() {
         feedback.innerText = "Invalid code... keep hunting!";
         feedback.style.color = "var(--deep-purple)";
     }
-
     input.value = ""; 
     updateUI();
 }
@@ -133,9 +152,10 @@ function checkCode() {
 // --- CLICK LOGIC ---
 document.getElementById('lincoln-main').addEventListener('click', (e) => {
     let hatBonus = (equippedHat === "bunnyears") ? 1.5 : 1.0;
-    let val = clickPower * (1 + (goldenTortas * 0.1)) * hatBonus; 
+    let val = clickPower * (1 + (goldenTortas * 0.1)) * hatBonus * eventMultiplier; 
     energy += val;
-    showParticle(e.clientX, e.clientY, `🥚`);
+    const particleEmoji = (new Date().getDay() === 2) ? "🌮" : "🥚";
+    showParticle(e.clientX, e.clientY, particleEmoji);
     updateUI();
 });
 
@@ -209,12 +229,13 @@ function crackMysteryEgg() {
 
 // --- UI AND SHOP LOGIC ---
 function updateUI() {
+    checkTacoTuesday();
     const scoreElement = document.getElementById('score-text');
     if(scoreElement) scoreElement.innerText = formatNumber(energy);
     
     let hatClickMult = (equippedHat === "bunnyears") ? 1.5 : 1.0;
     const clickStat = document.getElementById('stat-click');
-    if(clickStat) clickStat.innerText = formatNumber(clickPower * (1 + (goldenTortas * 0.1)) * hatClickMult);
+    if(clickStat) clickStat.innerText = formatNumber(clickPower * (1 + (goldenTortas * 0.1)) * hatClickMult * eventMultiplier);
     
     const cpsStat = document.getElementById('stat-cps');
     if(cpsStat) cpsStat.innerText = formatNumber(cps * (1 + (goldenTortas * 0.1)));
@@ -250,10 +271,10 @@ function updateUI() {
     const body = document.body; 
     const label = document.getElementById('env-label');
     if (label) {
-        if (energy < 100000) { body.className = 'bg-kitchen'; label.innerText = "LOCATION: THE GARDEN GATE"; }
-        else if (energy < 10000000) { body.className = 'bg-buffet'; label.innerText = "LOCATION: BLOOMING FLOWERBEDS"; }
-        else if (energy < 50000000) { body.className = 'bg-factory'; label.innerText = "LOCATION: CANDY WORKSHOP"; }
-        else { body.className = 'bg-space'; label.innerText = "LOCATION: THE GREAT EGG NEBULA"; }
+        if (energy < 100000) { body.className = 'bg-kitchen'; label.innerText = eventMultiplier > 1 ? "EVENT: TACO FIESTA" : "LOCATION: THE GARDEN GATE"; }
+        else if (energy < 10000000) { body.className = 'bg-buffet'; label.innerText = eventMultiplier > 1 ? "EVENT: TACO FIESTA" : "LOCATION: BLOOMING FLOWERBEDS"; }
+        else if (energy < 50000000) { body.className = 'bg-factory'; label.innerText = eventMultiplier > 1 ? "EVENT: TACO FIESTA" : "LOCATION: CANDY WORKSHOP"; }
+        else { body.className = 'bg-space'; label.innerText = eventMultiplier > 1 ? "EVENT: TACO FIESTA" : "LOCATION: THE GREAT EGG NEBULA"; }
     }
     refreshWardrobeUI();
 }
@@ -335,18 +356,11 @@ function prestige() {
     const bonus = Math.floor(Math.pow(energy / 100000000, 0.5)) + 1;
     if (confirm(`Find ${bonus} Golden Carrots?`)) {
         goldenTortas += bonus; 
-        energy = 0; 
-        clickPower = 1; 
-        cps = 0;
-        mysteryEggCost = 500; 
+        energy = 0; clickPower = 1; cps = 0; mysteryEggCost = 500; 
         const mysteryBtn = document.getElementById('mystery-egg-btn');
-        if (mysteryBtn) {
-            mysteryBtn.innerText = `CRACK MYSTERY EGG (Cost: 500)`;
-        }
+        if (mysteryBtn) mysteryBtn.innerText = `CRACK MYSTERY EGG (Cost: 500)`;
         upgrades = JSON.parse(JSON.stringify(initialUpgrades));
-        initShop(); 
-        saveGame(); 
-        updateUI();
+        initShop(); saveGame(); updateUI();
     }
 }
 
@@ -366,19 +380,11 @@ function loadGame() {
     const saved = localStorage.getItem(SAVE_KEY);
     if (saved) {
         const d = JSON.parse(saved);
-        energy = d.energy || 0; 
-        clickPower = d.clickPower || 1; 
-        cps = d.cps || 0;
-        goldenTortas = d.goldenTortas || 0; 
-        mysteryEggCost = d.mysteryEggCost || 500; 
-        equippedHat = d.equippedHat || "none"; 
-        usedCodes = d.usedCodes || [];
-
+        energy = d.energy || 0; clickPower = d.clickPower || 1; cps = d.cps || 0;
+        goldenTortas = d.goldenTortas || 0; mysteryEggCost = d.mysteryEggCost || 500; 
+        equippedHat = d.equippedHat || "none"; usedCodes = d.usedCodes || [];
         const mysteryBtn = document.getElementById('mystery-egg-btn');
-        if (mysteryBtn) {
-            mysteryBtn.innerText = `CRACK MYSTERY EGG (Cost: ${formatNumber(mysteryEggCost)})`;
-        }
-
+        if (mysteryBtn) mysteryBtn.innerText = `CRACK MYSTERY EGG (Cost: ${formatNumber(mysteryEggCost)})`;
         if (d.lastSaveTime && cps > 0) {
             const now = Date.now();
             const diffSeconds = (now - d.lastSaveTime) / 1000;
@@ -386,36 +392,21 @@ function loadGame() {
             const offlineGains = Math.floor(boostedCPS * 0.5 * diffSeconds); 
             if (offlineGains > 0) {
                 energy += offlineGains;
-                setTimeout(() => {
-                    alert(`Welcome back! Lincoln found ${formatNumber(offlineGains)} eggs while you were away!`);
-                }, 500);
+                setTimeout(() => alert(`Welcome back! Lincoln found ${formatNumber(offlineGains)} eggs while you were away!`), 500);
             }
         }
-
-        if (d.ownedHats) d.ownedHats.forEach(id => { 
-            const hat = hats.find(h => h.id === id); 
-            if (hat) hat.owned = true; 
-        });
-        
+        if (d.ownedHats) d.ownedHats.forEach(id => { const hat = hats.find(h => h.id === id); if (hat) hat.owned = true; });
         if (d.upgrades) d.upgrades.forEach(savedU => { 
             const currentU = upgrades.find(u => u.id === savedU.id); 
-            if (currentU) { 
-                currentU.count = savedU.count; 
-                currentU.cost = savedU.cost; 
-            } 
+            if (currentU) { currentU.count = savedU.count; currentU.cost = savedU.cost; } 
         });
     }
-    initShop(); 
-    initWardrobe(); 
-    applyHatVisuals(); 
-    updateUI();
+    initShop(); initWardrobe(); applyHatVisuals(); updateUI();
 }
 
 function toggleFeedback(show) {
     const overlay = document.getElementById('feedback-overlay');
-    if (overlay) {
-        overlay.style.display = show ? 'flex' : 'none';
-    }
+    if (overlay) overlay.style.display = show ? 'flex' : 'none';
 }
 
 function resetGame() { 
