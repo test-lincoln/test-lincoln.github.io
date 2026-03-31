@@ -4,8 +4,10 @@ function toggleLog(show) {
     if (overlay) overlay.style.display = show ? 'flex' : 'none';
 }
 
+// Show patch notes on first visit of the session
 if (!sessionStorage.getItem('logSeen')) {
-    toggleLog(true);
+    // Small delay to ensure the page is ready
+    setTimeout(() => toggleLog(true), 100);
     sessionStorage.setItem('logSeen', 'true');
 }
 
@@ -177,7 +179,6 @@ function updateUI() {
     const prestigeStat = document.getElementById('stat-prestige');
     if(prestigeStat) prestigeStat.innerText = goldenTortas;
     
-    // Prestige button unlocks at 100 Million
     const pBtn = document.getElementById('prestige-btn');
     if(pBtn) pBtn.style.display = energy >= 100000000 ? 'block' : 'none';
     
@@ -294,13 +295,11 @@ function prestige() {
         energy = 0; 
         clickPower = 1; 
         cps = 0;
-        
         mysteryEggCost = 500; 
         const mysteryBtn = document.getElementById('mystery-egg-btn');
         if (mysteryBtn) {
             mysteryBtn.innerText = `CRACK MYSTERY EGG (Cost: 500)`;
         }
-
         upgrades = JSON.parse(JSON.stringify(initialUpgrades));
         initShop(); 
         saveGame(); 
@@ -369,7 +368,7 @@ function loadGame() {
     updateUI();
 }
 
-// --- FEEDBACK POP-UP LOGIC ---
+// --- UPDATED FEEDBACK TOGGLE ---
 function toggleFeedback(show) {
     const overlay = document.getElementById('feedback-overlay');
     if (overlay) {
