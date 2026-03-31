@@ -13,6 +13,7 @@ const SAVE_KEY = "lincoln_ultimate_save";
 let energy = 0, clickPower = 1, cps = 0, goldenTortas = 50;
 let mysteryEggCost = 500;
 let equippedHat = "none"; 
+let usedCodes = []; // Track used codes here
 
 // --- WARDROBE DATA ---
 const hats = [
@@ -56,29 +57,48 @@ const initialUpgrades = [
 
 let upgrades = JSON.parse(JSON.stringify(initialUpgrades));
 
-// --- SECRET CODE LOGIC (Idea 46) ---
+// --- SECRET CODE LOGIC (One-time use) ---
 function checkCode() {
     const input = document.getElementById('code-input');
     if (!input) return;
     const code = input.value.toUpperCase().trim();
     const feedback = document.getElementById('code-feedback');
 
+    // Check if code was already used
+    if (usedCodes.includes(code)) {
+        feedback.innerText = "You already used this code!";
+        feedback.style.color = "red";
+        input.value = "";
+        return;
+    }
+
+    let success = false;
+
     if (code === "BUNNY") {
         energy += 5000;
         feedback.innerText = "CODDLE! +5,000 Eggs!";
+        success = true;
     } else if (code === "LINCOLN") {
         goldenTortas += 2;
         feedback.innerText = "CHAMPION! +2 Golden Carrots!";
+        success = true;
     } else if (code === "HIDDEN") {
         clickPower *= 2;
         feedback.innerText = "POWER UP! Click power doubled!";
+        success = true;
     } else {
         feedback.innerText = "Invalid code... keep hunting!";
+        feedback.style.color = "var(--deep-purple)";
     }
     
+    if (success) {
+        usedCodes.push(code); // Mark as used
+        feedback.style.color = "green";
+        saveGame();
+    }
+
     input.value = ""; 
     updateUI();
-    saveGame();
 }
 
 // --- CLICK LOGIC ---
@@ -346,12 +366,13 @@ function showParticle(x, y, text) {
     document.body.appendChild(p); setTimeout(() => p.remove(), 800);
 }
 
-// --- UPDATED SAVE/LOAD (Idea 36) ---
+// --- UPDATED SAVE/LOAD ---
 function saveGame() {
     const ownedHats = hats.filter(h => h.owned).map(h => h.id);
     const gameData = { 
         energy, clickPower, cps, goldenTortas, upgrades, 
         mysteryEggCost, equippedHat, ownedHats,
+        usedCodes, // Save used codes
         lastSaveTime: Date.now() 
     };
     localStorage.setItem(SAVE_KEY, JSON.stringify(gameData));
@@ -367,6 +388,7 @@ function loadGame() {
         goldenTortas = d.goldenTortas || 0;
         mysteryEggCost = d.mysteryEggCost || 500;
         equippedHat = d.equippedHat || "none";
+        usedCodes = d.usedCodes || []; // Load used codes
         
         // --- OFFLINE PROGRESS CALCULATION ---
         if (d.lastSaveTime) {
@@ -374,7 +396,7 @@ function loadGame() {
             const secondsOffline = Math.floor((now - d.lastSaveTime) / 1000);
             if (secondsOffline > 60) {
                 const boostedCPS = cps * (1 + (goldenTortas * 0.1));
-                const earned = boostedCPS * secondsOffline * 0.5; // 50% offline rate
+                const earned = boostedCPS * secondsOffline * 0.5;
                 if (earned > 1) {
                     energy += earned;
                     alert(`While you were away for ${Math.floor(secondsOffline/60)} minutes, Lincoln gathered ${Math.floor(earned).toLocaleString()} eggs!`);
