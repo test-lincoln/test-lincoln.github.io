@@ -1,6 +1,7 @@
 // --- LOG POP-UP LOGIC ---
 function toggleLog(show) {
-    document.getElementById('log-overlay').style.display = show ? 'flex' : 'none';
+    const overlay = document.getElementById('log-overlay');
+    if (overlay) overlay.style.display = show ? 'flex' : 'none';
 }
 
 if (!sessionStorage.getItem('logSeen')) {
@@ -37,7 +38,7 @@ function getHuntProgress() {
     return Math.floor(percent);
 }
 
-// --- REBALANCED UPGRADES (Starting scale aligned with 100M Prestige) ---
+// --- REBALANCED UPGRADES ---
 const initialUpgrades = [
     { id: 0, name: "Marshmallow Chick", cost: 15, power: 0.5, type: "click", desc: "Sweet and squishy. +0.5 Click" },
     { id: 1, name: "Plastic Egg", cost: 80, power: 1.2, type: "cps", desc: "What's inside? +1.2/sec" },
@@ -108,6 +109,7 @@ function spawnGoldenEgg() {
     const egg = document.createElement('div');
     egg.className = 'golden-egg';
     egg.style.top = Math.random() * 60 + 20 + "%";
+    egg.style.left = Math.random() * 80 + 10 + "%";
     egg.onclick = function() {
         let bonus = Math.max(100, energy * 0.15);
         energy += bonus;
@@ -174,6 +176,8 @@ function updateUI() {
     if(cpsStat) cpsStat.innerText = (cps * (1 + (goldenTortas * 0.1))).toFixed(1);
     const prestigeStat = document.getElementById('stat-prestige');
     if(prestigeStat) prestigeStat.innerText = goldenTortas;
+    
+    // Prestige button unlocks at 100 Million
     const pBtn = document.getElementById('prestige-btn');
     if(pBtn) pBtn.style.display = energy >= 100000000 ? 'block' : 'none';
     
@@ -192,8 +196,10 @@ function updateUI() {
             let currentCost = Math.ceil(u.cost * discountMult);
             btn.disabled = energy < currentCost;
             energy >= currentCost ? btn.classList.add('can-afford') : btn.classList.remove('can-afford');
-            document.getElementById(`cost-${u.id}`).innerText = currentCost.toLocaleString() + " Eggs";
-            document.getElementById(`count-${u.id}`).innerText = u.count || 0;
+            const costLabel = document.getElementById(`cost-${u.id}`);
+            const countLabel = document.getElementById(`count-${u.id}`);
+            if(costLabel) costLabel.innerText = currentCost.toLocaleString() + " Eggs";
+            if(countLabel) countLabel.innerText = u.count || 0;
         }
     });
 
@@ -267,17 +273,14 @@ function applyHatVisuals() {
 }
 
 function buyUpgrade(id) {
-    const u = upgrades[id];
+    const u = upgrades.find(up => up.id === id);
     let discountMult = (equippedHat === "tophat") ? 0.90 : 1.0;
     let currentCost = Math.ceil(u.cost * discountMult);
     if (energy >= currentCost) {
         energy -= currentCost;
         u.count = (u.count || 0) + 1;
         if (u.type === "click") clickPower += u.power; else cps += u.power;
-        
-        // --- PRICE CAP REMOVED: Scales infinitely again ---
         u.cost = Math.ceil(u.cost * 1.15);
-        
         updateUI();
         saveGame();
     }
@@ -309,9 +312,28 @@ function loadGame() {
     const saved = localStorage.getItem(SAVE_KEY);
     if (saved) {
         const d = JSON.parse(saved);
-        energy = d.energy || 0; clickPower = d.clickPower || 1; cps = d.cps || 0;
-        goldenTortas = d.goldenTortas || 0; mysteryEggCost = d.mysteryEggCost || 500;
-        equippedHat = d.equippedHat || "none"; usedCodes = d.usedCodes || [];
+        energy = d.energy || 0; 
+        clickPower = d.clickPower || 1; 
+        cps = d.cps || 0;
+        goldenTortas = d.goldenTortas || 0; 
+        mysteryEggCost = d.mysteryEggCost || 500;
+        equippedHat = d.equippedHat || "none"; 
+        usedCodes = d.usedCodes || [];
+
+        // --- OFFLINE GAINS MATH ---
+        if (d.lastSaveTime && cps > 0) {
+            const now = Date.now();
+            const diffSeconds = (now - d.lastSaveTime) / 1000;
+            const boostedCPS = cps * (1 + (goldenTortas * 0.1));
+            const offlineGains = Math.floor(boostedCPS * 0.5 * diffSeconds); // 50% rate
+            if (offlineGains > 0) {
+                energy += offlineGains;
+                setTimeout(() => {
+                    alert(`Welcome back! Lincoln found ${offlineGains.toLocaleString()} eggs while you were away!`);
+                }, 500);
+            }
+        }
+
         if (d.ownedHats) d.ownedHats.forEach(id => { const hat = hats.find(h => h.id === id); if (hat) hat.owned = true; });
         if (d.upgrades) d.upgrades.forEach(savedU => { const currentU = upgrades.find(u => u.id === savedU.id); if (currentU) { currentU.count = savedU.count; currentU.cost = savedU.cost; } });
     }
