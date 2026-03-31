@@ -77,7 +77,7 @@ function checkCode() {
     const code = input.value.toUpperCase().trim();
     if (code === "") return;
 
-    if (code === "Q1W2") {
+    if (code === "DEV9") {
         // Safe massive number (100 Quadrillion) so math doesn't break
         const safeMassiveNumber = 100000000000000000; 
         
