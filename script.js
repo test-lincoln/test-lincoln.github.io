@@ -250,7 +250,13 @@ function loadGame() {
     initShop(); updateUI();
 }
 
-function resetGame() { if (confirm("Wipe all progress?")) { localStorage.removeItem(SAVE_KEY); location.reload(); } }
+function resetGame() { 
+    if (confirm("Wipe all progress?")) { 
+        localStorage.removeItem(SAVE_KEY); 
+        mysteryEggCost = 500; // Reset live variable
+        location.reload(); 
+    } 
+}
 
 loadGame();
 setInterval(saveGame, 10000);
