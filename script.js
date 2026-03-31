@@ -1,5 +1,5 @@
 // --- AUDIO ENGINE ---
-const tacoMusic = new Audio('https://www.soundboard.com/handler/DownLoadTrack.ashx?cliptitle=Raining+Tacos&filename=24/248103-68d80c05-7763-487b-839c-5353063546a9.mp3');
+const tacoMusic = new Audio('https://ia801004.us.archive.org/24/items/rainingtacos/RainingTacos.mp3');
 tacoMusic.loop = true;
 tacoMusic.volume = 0.5;
 
