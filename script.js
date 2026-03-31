@@ -370,6 +370,11 @@ function loadGame() {
     updateUI();
 }
 
+function toggleFeedback(show) {
+    const overlay = document.getElementById('feedback-overlay');
+    overlay.style.display = show ? 'flex' : 'none';
+}
+
 function resetGame() { 
     if (confirm("Wipe all progress?")) { 
         localStorage.removeItem(SAVE_KEY); 
