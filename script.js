@@ -56,6 +56,31 @@ const initialUpgrades = [
 
 let upgrades = JSON.parse(JSON.stringify(initialUpgrades));
 
+// --- SECRET CODE LOGIC (Idea 46) ---
+function checkCode() {
+    const input = document.getElementById('code-input');
+    if (!input) return;
+    const code = input.value.toUpperCase().trim();
+    const feedback = document.getElementById('code-feedback');
+
+    if (code === "BUNNY") {
+        energy += 5000;
+        feedback.innerText = "CODDLE! +5,000 Eggs!";
+    } else if (code === "LINCOLN") {
+        goldenTortas += 2;
+        feedback.innerText = "CHAMPION! +2 Golden Carrots!";
+    } else if (code === "HIDDEN") {
+        clickPower *= 2;
+        feedback.innerText = "POWER UP! Click power doubled!";
+    } else {
+        feedback.innerText = "Invalid code... keep hunting!";
+    }
+    
+    input.value = ""; 
+    updateUI();
+    saveGame();
+}
+
 // --- CLICK LOGIC ---
 document.getElementById('lincoln-main').addEventListener('click', (e) => {
     let hatBonus = (equippedHat === "bunnyears") ? 1.5 : 1.0;
@@ -153,23 +178,33 @@ function crackMysteryEgg() {
 
 // --- UI AND SHOP LOGIC ---
 function updateUI() {
-    document.getElementById('score-text').innerText = Math.floor(energy).toLocaleString();
+    const scoreElement = document.getElementById('score-text');
+    if(scoreElement) scoreElement.innerText = Math.floor(energy).toLocaleString();
     
     let hatClickMult = (equippedHat === "bunnyears") ? 1.5 : 1.0;
-    document.getElementById('stat-click').innerText = (clickPower * (1 + (goldenTortas * 0.1)) * hatClickMult).toFixed(1);
-    document.getElementById('stat-cps').innerText = (cps * (1 + (goldenTortas * 0.1))).toFixed(1);
-    document.getElementById('stat-prestige').innerText = goldenTortas;
-    document.getElementById('prestige-btn').style.display = energy >= 1000000000 ? 'block' : 'none';
+    const clickStat = document.getElementById('stat-click');
+    if(clickStat) clickStat.innerText = (clickPower * (1 + (goldenTortas * 0.1)) * hatClickMult).toFixed(1);
+    
+    const cpsStat = document.getElementById('stat-cps');
+    if(cpsStat) cpsStat.innerText = (cps * (1 + (goldenTortas * 0.1))).toFixed(1);
+    
+    const prestigeStat = document.getElementById('stat-prestige');
+    if(prestigeStat) prestigeStat.innerText = goldenTortas;
+
+    const pBtn = document.getElementById('prestige-btn');
+    if(pBtn) pBtn.style.display = energy >= 1000000000 ? 'block' : 'none';
     
     const huntPercent = getHuntProgress();
     const fill = document.getElementById('global-bar-fill');
     const text = document.getElementById('global-text');
-    if (huntPercent === -1) {
-        fill.style.width = "0%";
-        text.innerText = `GLOBAL HUNT STARTS ON APRIL 5TH`;
-    } else {
-        fill.style.width = huntPercent + "%";
-        text.innerText = `GLOBAL HUNT PROGRESS: ${huntPercent}% TO SPRING REVELRY`;
+    if (fill && text) {
+        if (huntPercent === -1) {
+            fill.style.width = "0%";
+            text.innerText = `GLOBAL HUNT STARTS ON APRIL 5TH`;
+        } else {
+            fill.style.width = huntPercent + "%";
+            text.innerText = `GLOBAL HUNT PROGRESS: ${huntPercent}% TO SPRING REVELRY`;
+        }
     }
 
     upgrades.forEach(u => {
@@ -186,16 +221,19 @@ function updateUI() {
 
     const body = document.body; 
     const label = document.getElementById('env-label');
-    if (energy < 100000) { body.className = 'bg-kitchen'; label.innerText = "LOCATION: THE GARDEN GATE"; }
-    else if (energy < 10000000) { body.className = 'bg-buffet'; label.innerText = "LOCATION: BLOOMING FLOWERBEDS"; }
-    else if (energy < 1000000000) { body.className = 'bg-factory'; label.innerText = "LOCATION: CANDY WORKSHOP"; }
-    else { body.className = 'bg-space'; label.innerText = "LOCATION: THE GREAT EGG NEBULA"; }
+    if (label) {
+        if (energy < 100000) { body.className = 'bg-kitchen'; label.innerText = "LOCATION: THE GARDEN GATE"; }
+        else if (energy < 10000000) { body.className = 'bg-buffet'; label.innerText = "LOCATION: BLOOMING FLOWERBEDS"; }
+        else if (energy < 1000000000) { body.className = 'bg-factory'; label.innerText = "LOCATION: CANDY WORKSHOP"; }
+        else { body.className = 'bg-space'; label.innerText = "LOCATION: THE GREAT EGG NEBULA"; }
+    }
     
     refreshWardrobeUI();
 }
 
 function initShop() {
     const shop = document.getElementById('shop'); 
+    if(!shop) return;
     shop.innerHTML = '';
     upgrades.forEach(u => {
         const btn = document.createElement('button');
@@ -242,7 +280,6 @@ function refreshWardrobeUI() {
             btn.style.opacity = (goldenTortas >= h.cost) ? "1" : "0.5";
         }
 
-        // Added Multiplier Info to HTML inside the button
         btn.innerHTML = `
             <span style="font-size: 0.85rem; color: var(--deep-purple);">${h.name}</span>
             <span style="font-size: 0.65rem; color: #666; font-weight: normal;">${h.desc}</span>
@@ -309,9 +346,14 @@ function showParticle(x, y, text) {
     document.body.appendChild(p); setTimeout(() => p.remove(), 800);
 }
 
+// --- UPDATED SAVE/LOAD (Idea 36) ---
 function saveGame() {
     const ownedHats = hats.filter(h => h.owned).map(h => h.id);
-    const gameData = { energy, clickPower, cps, goldenTortas, upgrades, mysteryEggCost, equippedHat, ownedHats };
+    const gameData = { 
+        energy, clickPower, cps, goldenTortas, upgrades, 
+        mysteryEggCost, equippedHat, ownedHats,
+        lastSaveTime: Date.now() 
+    };
     localStorage.setItem(SAVE_KEY, JSON.stringify(gameData));
 }
 
@@ -326,6 +368,20 @@ function loadGame() {
         mysteryEggCost = d.mysteryEggCost || 500;
         equippedHat = d.equippedHat || "none";
         
+        // --- OFFLINE PROGRESS CALCULATION ---
+        if (d.lastSaveTime) {
+            const now = Date.now();
+            const secondsOffline = Math.floor((now - d.lastSaveTime) / 1000);
+            if (secondsOffline > 60) {
+                const boostedCPS = cps * (1 + (goldenTortas * 0.1));
+                const earned = boostedCPS * secondsOffline * 0.5; // 50% offline rate
+                if (earned > 1) {
+                    energy += earned;
+                    alert(`While you were away for ${Math.floor(secondsOffline/60)} minutes, Lincoln gathered ${Math.floor(earned).toLocaleString()} eggs!`);
+                }
+            }
+        }
+
         if (d.ownedHats) {
             d.ownedHats.forEach(id => {
                 const hat = hats.find(h => h.id === id);
@@ -340,7 +396,8 @@ function loadGame() {
             });
         }
     }
-    document.getElementById('mystery-egg-btn').innerText = `CRACK MYSTERY EGG (Cost: ${mysteryEggCost})`;
+    const mBtn = document.getElementById('mystery-egg-btn');
+    if(mBtn) mBtn.innerText = `CRACK MYSTERY EGG (Cost: ${mysteryEggCost})`;
     initShop(); 
     initWardrobe();
     applyHatVisuals();
