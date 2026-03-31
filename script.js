@@ -290,9 +290,22 @@ function prestige() {
     if (energy < 100000000) return;
     const bonus = Math.floor(Math.pow(energy / 100000000, 0.5)) + 1;
     if (confirm(`Find ${bonus} Golden Carrots?`)) {
-        goldenTortas += bonus; energy = 0; clickPower = 1; cps = 0;
+        goldenTortas += bonus; 
+        energy = 0; 
+        clickPower = 1; 
+        cps = 0;
+        
+        // --- THE FIX: Reset mystery egg cost ---
+        mysteryEggCost = 500; 
+        const mysteryBtn = document.getElementById('mystery-egg-btn');
+        if (mysteryBtn) {
+            mysteryBtn.innerText = `CRACK MYSTERY EGG (Cost: 500)`;
+        }
+
         upgrades = JSON.parse(JSON.stringify(initialUpgrades));
-        initShop(); saveGame(); updateUI();
+        initShop(); 
+        saveGame(); 
+        updateUI();
     }
 }
 
