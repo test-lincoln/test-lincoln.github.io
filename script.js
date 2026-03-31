@@ -3,7 +3,6 @@ function toggleLog(show) {
     document.getElementById('log-overlay').style.display = show ? 'flex' : 'none';
 }
 
-// Check if we need to show the update log (includes Wardrobe update)
 if (!sessionStorage.getItem('logSeen')) {
     toggleLog(true);
     sessionStorage.setItem('logSeen', 'true');
@@ -13,7 +12,7 @@ if (!sessionStorage.getItem('logSeen')) {
 const SAVE_KEY = "lincoln_ultimate_save"; 
 let energy = 0, clickPower = 1, cps = 0, goldenTortas = 0;
 let mysteryEggCost = 500;
-let equippedHat = "none"; // Track the current hat
+let equippedHat = "none"; 
 
 // --- WARDROBE DATA ---
 const hats = [
@@ -29,17 +28,14 @@ const START_DATE = new Date(2026, 3, 5);
 function getHuntProgress() {
     const now = new Date();
     if (now < START_DATE) return -1; 
-
     const diffTime = now - START_DATE;
     const diffDays = diffTime / (1000 * 60 * 60 * 24);
     let percent = (diffDays / 7) * 100;
-    
     if (percent < 0) percent = 0;
     if (percent > 100) percent = 100;
     return Math.floor(percent);
 }
 
-// BALANCING: Keeping the buffed power levels
 const initialUpgrades = [
     { id: 0, name: "Marshmallow Chick", cost: 15, power: 0.5, type: "click", desc: "Sweet and squishy. +0.5 Click" },
     { id: 1, name: "Plastic Egg", cost: 80, power: 1.2, type: "cps", desc: "What's inside? +1.2/sec" },
@@ -60,20 +56,23 @@ const initialUpgrades = [
 
 let upgrades = JSON.parse(JSON.stringify(initialUpgrades));
 
+// --- CLICK LOGIC ---
 document.getElementById('lincoln-main').addEventListener('click', (e) => {
-    let hatBonus = (equippedHat === "bunnyears") ? 1.5 : 1.0; // Bunny Ears Buff
+    let hatBonus = (equippedHat === "bunnyears") ? 1.5 : 1.0;
     let val = clickPower * (1 + (goldenTortas * 0.1)) * hatBonus; 
     energy += val;
     showParticle(e.clientX, e.clientY, `🥚`);
     updateUI();
 });
 
+// --- CPS INTERVAL ---
 setInterval(() => { 
     let boostedCPS = cps * (1 + (goldenTortas * 0.1)); 
     energy += (boostedCPS / 10); 
     updateUI(); 
 }, 100);
 
+// --- GOLDEN EGG LOGIC ---
 function spawnGoldenEgg() {
     const egg = document.createElement('div');
     egg.className = 'golden-egg';
@@ -88,12 +87,12 @@ function spawnGoldenEgg() {
     setTimeout(() => { if(egg.parentNode) egg.remove(); }, 10000);
 }
 
-// Golden Egg Interval - Propeller Hat doubles spawn chance
 setInterval(() => { 
     let spawnChance = (equippedHat === "propeller") ? 0.6 : 0.3;
     if(Math.random() < spawnChance) spawnGoldenEgg(); 
 }, 30000);
 
+// --- MYSTERY EGG LOGIC ---
 function crackMysteryEgg() {
     if (energy < mysteryEggCost) {
         alert("Not enough eggs to crack this one!");
@@ -152,6 +151,7 @@ function crackMysteryEgg() {
     }, 1500);
 }
 
+// --- UI AND SHOP LOGIC ---
 function updateUI() {
     document.getElementById('score-text').innerText = Math.floor(energy).toLocaleString();
     
@@ -162,12 +162,14 @@ function updateUI() {
     document.getElementById('prestige-btn').style.display = energy >= 1000000000 ? 'block' : 'none';
     
     const huntPercent = getHuntProgress();
+    const fill = document.getElementById('global-bar-fill');
+    const text = document.getElementById('global-text');
     if (huntPercent === -1) {
-        document.getElementById('global-bar-fill').style.width = "0%";
-        document.getElementById('global-text').innerText = `GLOBAL HUNT STARTS ON APRIL 5TH`;
+        fill.style.width = "0%";
+        text.innerText = `GLOBAL HUNT STARTS ON APRIL 5TH`;
     } else {
-        document.getElementById('global-bar-fill').style.width = huntPercent + "%";
-        document.getElementById('global-text').innerText = `GLOBAL HUNT PROGRESS: ${huntPercent}% TO SPRING REVELRY`;
+        fill.style.width = huntPercent + "%";
+        text.innerText = `GLOBAL HUNT PROGRESS: ${huntPercent}% TO SPRING REVELRY`;
     }
 
     upgrades.forEach(u => {
@@ -175,7 +177,6 @@ function updateUI() {
         if (btn) {
             let discountMult = (equippedHat === "tophat") ? 0.90 : 1.0;
             let currentCost = Math.ceil(u.cost * discountMult);
-            
             btn.disabled = energy < currentCost;
             energy >= currentCost ? btn.classList.add('can-afford') : btn.classList.remove('can-afford');
             document.getElementById(`cost-${u.id}`).innerText = currentCost.toLocaleString() + " Eggs";
@@ -183,17 +184,19 @@ function updateUI() {
         }
     });
 
-    const body = document.body; const label = document.getElementById('env-label');
+    const body = document.body; 
+    const label = document.getElementById('env-label');
     if (energy < 100000) { body.className = 'bg-kitchen'; label.innerText = "LOCATION: THE GARDEN GATE"; }
     else if (energy < 10000000) { body.className = 'bg-buffet'; label.innerText = "LOCATION: BLOOMING FLOWERBEDS"; }
     else if (energy < 1000000000) { body.className = 'bg-factory'; label.innerText = "LOCATION: CANDY WORKSHOP"; }
     else { body.className = 'bg-space'; label.innerText = "LOCATION: THE GREAT EGG NEBULA"; }
     
-    initWardrobe(); // Update wardrobe button states
+    refreshWardrobeUI();
 }
 
 function initShop() {
-    const shop = document.getElementById('shop'); shop.innerHTML = '';
+    const shop = document.getElementById('shop'); 
+    shop.innerHTML = '';
     upgrades.forEach(u => {
         const btn = document.createElement('button');
         btn.className = 'upgrade'; btn.id = `up-${u.id}`;
@@ -203,25 +206,34 @@ function initShop() {
     });
 }
 
+// --- WARDROBE CORE ---
 function initWardrobe() {
     const list = document.getElementById('wardrobe-list');
     if (!list) return;
     list.innerHTML = '';
     hats.forEach(h => {
         const btn = document.createElement('button');
-        btn.style.cssText = "min-width: 80px; padding: 5px; border-radius: 10px; border: 2px solid var(--lavender); cursor: pointer; font-size: 0.7rem; font-weight: bold;";
-        
+        btn.id = `hat-btn-${h.id}`;
+        btn.style.cssText = "min-width: 80px; padding: 8px; border-radius: 12px; border: 2px solid var(--lavender); cursor: pointer; font-size: 0.75rem; font-weight: bold; transition: 0.2s;";
+        btn.onclick = () => equipHat(h.id);
+        list.appendChild(btn);
+    });
+    refreshWardrobeUI();
+}
+
+function refreshWardrobeUI() {
+    hats.forEach(h => {
+        const btn = document.getElementById(`hat-btn-${h.id}`);
+        if (!btn) return;
         if (equippedHat === h.id) {
             btn.style.borderColor = "var(--grass)";
             btn.style.background = "var(--sunshine)";
             btn.innerText = `[${h.name}]`;
         } else {
-            btn.style.background = "white";
+            btn.style.background = (goldenTortas >= h.cost) ? "white" : "#f0f0f0";
+            btn.style.opacity = (goldenTortas >= h.cost) ? "1" : "0.6";
             btn.innerText = h.cost > 0 ? `${h.name} (${h.cost}🥕)` : h.name;
         }
-        
-        btn.onclick = () => equipHat(h.id);
-        list.appendChild(btn);
     });
 }
 
@@ -233,7 +245,7 @@ function equipHat(id) {
         updateUI();
         saveGame();
     } else {
-        alert("You need more Golden Carrots to unlock this style!");
+        alert(`You need ${h.cost} Golden Carrots to unlock the ${h.name}!`);
     }
 }
 
@@ -247,7 +259,6 @@ function buyUpgrade(id) {
     const u = upgrades[id];
     let discountMult = (equippedHat === "tophat") ? 0.90 : 1.0;
     let currentCost = Math.ceil(u.cost * discountMult);
-
     if (energy >= currentCost) {
         energy -= currentCost;
         u.count = (u.count || 0) + 1;
@@ -299,6 +310,7 @@ function loadGame() {
     }
     document.getElementById('mystery-egg-btn').innerText = `CRACK MYSTERY EGG (Cost: ${mysteryEggCost})`;
     initShop(); 
+    initWardrobe();
     applyHatVisuals();
     updateUI();
 }
@@ -310,5 +322,6 @@ function resetGame() {
     } 
 }
 
+// Start Game
 loadGame();
 setInterval(saveGame, 10000);
