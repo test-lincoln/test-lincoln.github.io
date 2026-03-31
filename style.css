@@ -72,6 +72,16 @@ body {
 }
 #lincoln-main:active { transform: scale(0.96); }
 
+/* --- WARDROBE VISUAL EFFECTS --- */
+.hat-tophat { filter: sepia(0.5) contrast(1.2); border-color: #444 !important; }
+.hat-bunnyears { border-color: var(--bubblegum) !important; filter: hue-rotate(330deg); }
+.hat-propeller { border-color: var(--gold) !important; animation: propeller-glow 2s infinite alternate; }
+
+@keyframes propeller-glow {
+    from { box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
+    to { box-shadow: 0 0 40px var(--gold); }
+}
+
 #mystery-egg-btn {
     background: var(--bubblegum); color: white; border: 3px solid var(--white);
     padding: 10px 20px; border-radius: 15px; cursor: pointer; font-weight: bold;
