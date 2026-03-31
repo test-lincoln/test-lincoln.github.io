@@ -16,6 +16,11 @@
         <h2 style="text-align:center; color:var(--bubblegum);">PATCH NOTES</h2>
         
         <div class="log-section">
+            <h3>🎩 Lincoln's Wardrobe</h3>
+            <p>Style meets power! You can now spend your <b>Golden Carrots</b> on exclusive hats for Lincoln. Each hat provides a unique permanent buff to help you conquer the hunt!</p>
+        </div>
+
+        <div class="log-section">
             <h3>🌟 The Golden Egg</h3>
             <p>A rare Golden Egg now has a 30% chance to float across your screen every 30 seconds! Click it fast—it disappears after 10 seconds. Catching it gives you a massive bonus worth 15% of your total eggs!</p>
         </div>
@@ -76,7 +81,15 @@
             </div>
         </div>
     </div>
-    <div class="shop-container" id="shop"></div>
+
+    <div class="shop-container">
+        <div style="background: rgba(255,255,255,0.6); padding: 15px; border-radius: 20px; margin-bottom: 15px; border: 2px solid var(--bubblegum);">
+            <h3 style="margin: 0 0 10px 0; font-size: 0.9rem; text-align: center;">LINCOLN'S WARDROBE</h3>
+            <div id="wardrobe-list" style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px;">
+                </div>
+        </div>
+        <div id="shop"></div>
+    </div>
 </div>
 
 <script src="script.js"></script>
