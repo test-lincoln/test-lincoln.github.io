@@ -14,55 +14,51 @@ let energy = 0, clickPower = 1, cps = 0, goldenTortas = 0;
 let mysteryEggCost = 500;
 
 // --- 7-DAY PROGRESS LOGIC ---
-const START_DATE = new Date(2026, 3, 5); // April 5th, 2026
+const START_DATE = new Date(2026, 3, 5); 
 
 function getHuntProgress() {
     const now = new Date();
-    
-    if (now < START_DATE) {
-        return -1; 
-    }
+    if (now < START_DATE) return -1; 
 
     const diffTime = now - START_DATE;
     const diffDays = diffTime / (1000 * 60 * 60 * 24);
-    
     let percent = (diffDays / 7) * 100;
     
     if (percent < 0) percent = 0;
     if (percent > 100) percent = 100;
-    
     return Math.floor(percent);
 }
 
+// BALANCING: Keeping the buffed power levels to make the game feel easier
 const initialUpgrades = [
-    { id: 0, name: "Marshmallow Chick", cost: 15, power: 0.1, type: "click", desc: "Sweet and squishy. +0.1 Click" },
-    { id: 1, name: "Plastic Egg", cost: 100, power: 0.3, type: "cps", desc: "What's inside? +0.3/sec" },
-    { id: 2, name: "Wicker Basket", cost: 500, power: 0.8, type: "cps", desc: "Room for more candy. +0.8/sec" },
-    { id: 3, name: "Jelly Bean Trail", cost: 1200, power: 0.6, type: "click", desc: "Follow the sugar. +0.6 Click" },
-    { id: 4, name: "Floppy Ears", cost: 3000, power: 2.5, type: "cps", desc: "Hear the candy coming. +2.5/sec" },
-    { id: 5, name: "Polka Dot Ribbon", cost: 10000, power: 7.0, type: "cps", desc: "Dressed for the hunt. +7.0/sec" },
-    { id: 6, name: "Chocolate Bunny", cost: 25000, power: 15.0, type: "cps", desc: "Solid or hollow? +15/sec" },
-    { id: 7, name: "Magic Carrot", cost: 85000, power: 50.0, type: "cps", desc: "Grown in sunlight. +50/sec" },
-    { id: 8, name: "Egg Decorating Kit", cost: 200000, power: 12, type: "click", desc: "Master of the dye. +12 Click" },
-    { id: 9, name: "Garden Parade", cost: 500000, power: 150, type: "cps", desc: "Marching for sweets. +150/sec" },
-    { id: 10, name: "Chocolate Fountain", cost: 2000000, power: 500, type: "cps", desc: "Infinite dipping. +500/sec" },
-    { id: 11, name: "The Big Bunny Hut", cost: 8000000, power: 1500, type: "cps", desc: "Bunny HQ. +1500/sec" },
-    { id: 12, name: "Diamond Egg", cost: 40000000, power: 1200, type: "click", desc: "The ultimate prize. +1200 Click" },
-    { id: 13, name: "Candy Kingdom", cost: 150000000, power: 18000, type: "cps", desc: "Sugar overload! +18k/sec" },
-    { id: 14, name: "Easter Morning Sun", cost: 2500000000, power: 120000, type: "cps", desc: "The perfect hunt day. +120k/sec" }
+    { id: 0, name: "Marshmallow Chick", cost: 15, power: 0.5, type: "click", desc: "Sweet and squishy. +0.5 Click" },
+    { id: 1, name: "Plastic Egg", cost: 80, power: 1.2, type: "cps", desc: "What's inside? +1.2/sec" },
+    { id: 2, name: "Wicker Basket", cost: 400, power: 3.5, type: "cps", desc: "Room for more candy. +3.5/sec" },
+    { id: 3, name: "Jelly Bean Trail", cost: 1000, power: 2.5, type: "click", desc: "Follow the sugar. +2.5 Click" },
+    { id: 4, name: "Floppy Ears", cost: 2500, power: 12.0, type: "cps", desc: "Hear the candy coming. +12/sec" },
+    { id: 5, name: "Polka Dot Ribbon", cost: 8000, power: 35.0, type: "cps", desc: "Dressed for the hunt. +35/sec" },
+    { id: 6, name: "Chocolate Bunny", cost: 20000, power: 85.0, type: "cps", desc: "Solid or hollow? +85/sec" },
+    { id: 7, name: "Magic Carrot", cost: 70000, power: 250.0, type: "cps", desc: "Grown in sunlight. +250/sec" },
+    { id: 8, name: "Egg Decorating Kit", cost: 150000, power: 65, type: "click", desc: "Master of the dye. +65 Click" },
+    { id: 9, name: "Garden Parade", cost: 400000, power: 850, type: "cps", desc: "Marching for sweets. +850/sec" },
+    { id: 10, name: "Chocolate Fountain", cost: 1500000, power: 2500, type: "cps", desc: "Infinite dipping. +2500/sec" },
+    { id: 11, name: "The Big Bunny Hut", cost: 5000000, power: 8000, type: "cps", desc: "Bunny HQ. +8000/sec" },
+    { id: 12, name: "Diamond Egg", cost: 25000000, power: 5000, type: "click", desc: "The ultimate prize. +5k Click" },
+    { id: 13, name: "Candy Kingdom", cost: 100000000, power: 65000, type: "cps", desc: "Sugar overload! +65k/sec" },
+    { id: 14, name: "Easter Morning Sun", cost: 1000000000, power: 500000, type: "cps", desc: "The perfect hunt day. +500k/sec" }
 ];
 
 let upgrades = JSON.parse(JSON.stringify(initialUpgrades));
 
 document.getElementById('lincoln-main').addEventListener('click', (e) => {
-    let val = clickPower * (1 + (goldenTortas * 0.1));
+    let val = clickPower * (1 + (goldenTortas * 0.1)); 
     energy += val;
     showParticle(e.clientX, e.clientY, `🥚`);
     updateUI();
 });
 
 setInterval(() => { 
-    let boostedCPS = cps * (1 + (goldenTortas * 0.1));
+    let boostedCPS = cps * (1 + (goldenTortas * 0.1)); 
     energy += (boostedCPS / 10); 
     updateUI(); 
 }, 100);
@@ -72,6 +68,7 @@ function spawnGoldenEgg() {
     egg.className = 'golden-egg';
     egg.style.top = Math.random() * 60 + 20 + "%";
     egg.onclick = function() {
+        // REVERTED: Original 15% reward
         let bonus = Math.max(100, energy * 0.15);
         energy += bonus;
         showParticle(window.innerWidth/2, window.innerHeight/2, `GOLDEN SURPRISE: +${Math.floor(bonus)}`);
@@ -80,15 +77,14 @@ function spawnGoldenEgg() {
     document.body.appendChild(egg);
     setTimeout(() => { if(egg.parentNode) egg.remove(); }, 10000);
 }
+// REVERTED: Original 30 second spawn timer
 setInterval(() => { if(Math.random() < 0.3) spawnGoldenEgg(); }, 30000);
 
-// --- UPDATED MYSTERY EGG WITH ANIMATION SAFETY FIXES ---
 function crackMysteryEgg() {
     if (energy < mysteryEggCost) {
         alert("Not enough eggs to crack this one!");
         return;
     }
-
     energy -= mysteryEggCost;
     updateUI();
 
@@ -97,14 +93,10 @@ function crackMysteryEgg() {
     const egg = document.getElementById('shaking-egg');
     const prizeDisplay = document.getElementById('egg-prize');
     
-    // Hide button fully and show egg container
     btn.style.display = 'none';
     container.style.display = 'flex';
-    
-    // Reset classes and trigger reflow to ensure animation plays
     egg.classList.remove('shake-it', 'cracked');
     void egg.offsetWidth; 
-    
     egg.classList.add('shake-it');
     prizeDisplay.innerText = "❓";
 
@@ -116,6 +108,7 @@ function crackMysteryEgg() {
         let resultText = "";
         let reward = 0;
 
+        // REVERTED: Original Win Rates (10% jackpot, 40% small win, 50% fail)
         if (roll < 0.1) {
             reward = mysteryEggCost * 5;
             prizeDisplay.innerText = "🐥";
@@ -135,17 +128,15 @@ function crackMysteryEgg() {
                 showParticle(window.innerWidth/2, window.innerHeight/2, `+${Math.floor(reward)}`);
             }
             alert(resultText);
-            
-            // Reset UI state
             container.style.display = 'none';
             btn.style.display = 'inline-block'; 
             
+            // REVERTED: Original 1.2x price increase
             mysteryEggCost = Math.ceil(mysteryEggCost * 1.2);
             btn.innerText = `CRACK MYSTERY EGG (Cost: ${mysteryEggCost})`;
             updateUI();
             saveGame();
         }, 1000);
-
     }, 1500);
 }
 
@@ -199,7 +190,8 @@ function buyUpgrade(id) {
         energy -= u.cost;
         u.count = (u.count || 0) + 1;
         if (u.type === "click") clickPower += u.power; else cps += u.power;
-        u.cost = Math.ceil(u.cost * 1.35);
+        // KEEPING: The 1.15x price scale (makes game easier/balanced)
+        u.cost = Math.ceil(u.cost * 1.15); 
         updateUI();
         saveGame();
     }
@@ -225,9 +217,6 @@ function showParticle(x, y, text) {
 function saveGame() {
     const gameData = { energy, clickPower, cps, goldenTortas, upgrades, mysteryEggCost };
     localStorage.setItem(SAVE_KEY, JSON.stringify(gameData));
-    const now = new Date();
-    const timeString = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
-    document.getElementById('save-status').innerText = `Saved at ${timeString}`;
 }
 
 function loadGame() {
@@ -253,7 +242,7 @@ function loadGame() {
 function resetGame() { 
     if (confirm("Wipe all progress?")) { 
         localStorage.removeItem(SAVE_KEY); 
-        mysteryEggCost = 500; // Reset live variable
+        mysteryEggCost = 500;
         location.reload(); 
     } 
 }
