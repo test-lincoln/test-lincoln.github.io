@@ -82,14 +82,13 @@ function spawnGoldenEgg() {
 }
 setInterval(() => { if(Math.random() < 0.3) spawnGoldenEgg(); }, 30000);
 
-// --- UPDATED MYSTERY EGG WITH ANIMATION ---
+// --- UPDATED MYSTERY EGG WITH ANIMATION SAFETY FIXES ---
 function crackMysteryEgg() {
     if (energy < mysteryEggCost) {
         alert("Not enough eggs to crack this one!");
         return;
     }
 
-    // Deduct cost and prep UI
     energy -= mysteryEggCost;
     updateUI();
 
@@ -98,19 +97,21 @@ function crackMysteryEgg() {
     const egg = document.getElementById('shaking-egg');
     const prizeDisplay = document.getElementById('egg-prize');
     
-    // Hide button and show egg
-    btn.style.visibility = 'hidden';
+    // Hide button fully and show egg container
+    btn.style.display = 'none';
     container.style.display = 'flex';
+    
+    // Reset classes and trigger reflow to ensure animation plays
+    egg.classList.remove('shake-it', 'cracked');
+    void egg.offsetWidth; 
+    
     egg.classList.add('shake-it');
-    egg.classList.remove('cracked');
     prizeDisplay.innerText = "❓";
 
-    // 1. Shake for 1.5 seconds
     setTimeout(() => {
         egg.classList.remove('shake-it');
         egg.classList.add('cracked');
 
-        // 2. Decide the prize
         const roll = Math.random();
         let resultText = "";
         let reward = 0;
@@ -128,7 +129,6 @@ function crackMysteryEgg() {
             resultText = "Oh no! It was a hollow egg.";
         }
 
-        // 3. Reveal reward
         setTimeout(() => {
             if (reward > 0) {
                 energy += reward;
@@ -136,9 +136,10 @@ function crackMysteryEgg() {
             }
             alert(resultText);
             
-            // Clean up and reset button
+            // Reset UI state
             container.style.display = 'none';
-            btn.style.visibility = 'visible';
+            btn.style.display = 'inline-block'; 
+            
             mysteryEggCost = Math.ceil(mysteryEggCost * 1.2);
             btn.innerText = `CRACK MYSTERY EGG (Cost: ${mysteryEggCost})`;
             updateUI();
