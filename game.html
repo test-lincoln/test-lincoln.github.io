@@ -6,6 +6,27 @@
     <title>Lincoln's Egg-celent Adventure</title>
     <link rel="icon" type="image/jpeg" href="IMG_0668.jpeg">
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* This CSS ensures the codes and reset stay put */
+        .fixed-system-controls {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 260px; /* Matches the left column width */
+            z-index: 100;
+        }
+
+        /* Adds space so Lincoln doesn't overlap the fixed box */
+        .left-column {
+            padding-bottom: 200px; 
+        }
+
+        /* Makes the shop area scrollable independently */
+        .shop-container {
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+    </style>
 </head>
 <body class="bg-kitchen">
 
@@ -92,18 +113,21 @@
             
             <button id="mystery-egg-btn" onclick="crackMysteryEgg()">CRACK MYSTERY EGG (Cost: 500)</button>
 
-            <div style="background: rgba(255,255,255,0.8); padding: 12px; border-radius: 20px; margin-top: 15px; border: 2px dashed var(--deep-purple); width: 100%; box-sizing: border-box;">
-                <h4 style="margin: 0 0 8px 0; font-size: 0.8rem; color: var(--deep-purple);">SECRET CODES</h4>
-                <div style="display:flex; gap: 5px;">
-                    <input type="text" id="code-input" placeholder="Enter code..." style="flex-grow: 1; padding: 8px; border-radius: 10px; border: 1px solid #ccc; font-size: 0.8rem;">
-                    <button onclick="checkCode()" style="background: var(--deep-purple); color: white; border: none; padding: 8px 12px; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 0.7rem;">REDEEM</button>
-                </div>
-                <p id="code-feedback" style="font-size: 0.6rem; margin-top: 5px; color: var(--deep-purple); font-weight: bold; min-height: 10px;"></p>
-            </div>
-
             <button class="prestige-btn" id="prestige-btn" style="display:none; margin-top:10px; padding:10px; background:var(--gold); border:none; border-radius:10px; cursor:pointer;" onclick="prestige()">BIG REVEAL (WEIGH IN)</button>
-            <div style="margin-top:20px;">
-                <button onclick="resetGame()" style="background:none; border:none; color:var(--deep-purple); cursor:pointer; font-size: 0.7rem; text-decoration: underline; opacity: 0.5;">Reset Adventure</button>
+        </div>
+    </div>
+
+    <div class="fixed-system-controls">
+        <div style="background: rgba(255,255,255,0.9); padding: 12px; border-radius: 20px; border: 2px dashed var(--deep-purple); box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+            <h4 style="margin: 0 0 8px 0; font-size: 0.8rem; color: var(--deep-purple);">SECRET CODES</h4>
+            <div style="display:flex; gap: 5px;">
+                <input type="text" id="code-input" placeholder="Enter code..." style="flex-grow: 1; padding: 8px; border-radius: 10px; border: 1px solid #ccc; font-size: 0.8rem;">
+                <button onclick="checkCode()" style="background: var(--deep-purple); color: white; border: none; padding: 8px 12px; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 0.7rem;">REDEEM</button>
+            </div>
+            <p id="code-feedback" style="font-size: 0.6rem; margin-top: 5px; color: var(--deep-purple); font-weight: bold; min-height: 10px;"></p>
+            
+            <div style="text-align: center; margin-top: 5px; border-top: 1px solid #eee; padding-top: 5px;">
+                <button onclick="resetGame()" style="background:none; border:none; color:var(--deep-purple); cursor:pointer; font-size: 0.7rem; text-decoration: underline; opacity: 0.6;">Reset Adventure</button>
             </div>
         </div>
     </div>
