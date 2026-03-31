@@ -10,16 +10,17 @@ if (!sessionStorage.getItem('logSeen')) {
 
 // --- CORE GAME DATA ---
 const SAVE_KEY = "lincoln_ultimate_save"; 
-let energy = 9999999999, clickPower = 1, cps = 0, goldenTortas = 999;
+let energy = 0, clickPower = 1, cps = 0, goldenTortas = 0;
 let mysteryEggCost = 500;
 let equippedHat = "none"; 
 
 // --- WARDROBE DATA ---
+// Added 'owned' property to track permanent unlocks
 const hats = [
-    { id: 'none', name: 'No Hat', cost: 0, buff: 1, type: 'none', desc: 'Just regular Lincoln.' },
-    { id: 'tophat', name: 'Top Hat', cost: 5, buff: 0.90, type: 'discount', desc: 'Classy! Shop items cost 10% less.' },
-    { id: 'propeller', name: 'Propeller', cost: 10, buff: 2.0, type: 'gold', desc: 'Lucky! 2x Golden Egg spawns.' },
-    { id: 'bunnyears', name: 'Bunny Ears', cost: 25, buff: 1.5, type: 'click', desc: 'Easter Spirit! +50% Click Power.' }
+    { id: 'none', name: 'No Hat', cost: 0, owned: true, buff: 1, type: 'none', desc: 'Just regular Lincoln.' },
+    { id: 'tophat', name: 'Top Hat', cost: 5, owned: false, buff: 0.90, type: 'discount', desc: 'Classy! Shop items cost 10% less.' },
+    { id: 'propeller', name: 'Propeller', cost: 10, owned: false, buff: 2.0, type: 'gold', desc: 'Lucky! 2x Golden Egg spawns.' },
+    { id: 'bunnyears', name: 'Bunny Ears', cost: 25, owned: false, buff: 1.5, type: 'click', desc: 'Easter Spirit! +50% Click Power.' }
 ];
 
 // --- 7-DAY PROGRESS LOGIC ---
@@ -214,8 +215,8 @@ function initWardrobe() {
     hats.forEach(h => {
         const btn = document.createElement('button');
         btn.id = `hat-btn-${h.id}`;
-        btn.style.cssText = "min-width: 80px; padding: 8px; border-radius: 12px; border: 2px solid var(--lavender); cursor: pointer; font-size: 0.75rem; font-weight: bold; transition: 0.2s;";
-        btn.onclick = () => equipHat(h.id);
+        btn.style.cssText = "min-width: 80px; padding: 10px; border-radius: 12px; border: 2px solid var(--lavender); cursor: pointer; font-size: 0.75rem; font-weight: bold; transition: 0.2s;";
+        btn.onclick = () => handleHatAction(h);
         list.appendChild(btn);
     });
     refreshWardrobeUI();
@@ -229,30 +230,45 @@ function refreshWardrobeUI() {
             btn.style.borderColor = "var(--grass)";
             btn.style.background = "var(--sunshine)";
             btn.innerText = `[${h.name}]`;
+        } else if (h.owned) {
+            btn.style.background = "white";
+            btn.style.borderColor = "var(--lavender)";
+            btn.innerText = `Equip ${h.name}`;
+            btn.style.opacity = "1";
         } else {
-            btn.style.background = (goldenTortas >= h.cost) ? "white" : "#f0f0f0";
-            btn.style.opacity = (goldenTortas >= h.cost) ? "1" : "0.6";
+            btn.style.background = "#f0f0f0";
             btn.innerText = h.cost > 0 ? `${h.name} (${h.cost}🥕)` : h.name;
+            btn.style.opacity = (goldenTortas >= h.cost) ? "1" : "0.5";
         }
     });
 }
 
-function equipHat(id) {
-    const h = hats.find(x => x.id === id);
-    if (goldenTortas >= h.cost) {
-        equippedHat = id;
-        applyHatVisuals();
-        updateUI();
-        saveGame();
+function handleHatAction(hat) {
+    if (hat.owned) {
+        equippedHat = hat.id;
     } else {
-        alert(`You need ${h.cost} Golden Carrots to unlock the ${h.name}!`);
+        if (goldenTortas >= hat.cost) {
+            if (confirm(`Spend ${hat.cost} Golden Carrots to permanently unlock the ${hat.name}?`)) {
+                goldenTortas -= hat.cost;
+                hat.owned = true;
+                equippedHat = hat.id;
+            }
+        } else {
+            alert(`You need ${hat.cost} Golden Carrots! Prestige to earn more.`);
+            return;
+        }
     }
+    applyHatVisuals();
+    updateUI();
+    saveGame();
 }
 
 function applyHatVisuals() {
-    const img = document.getElementById('lincoln-main');
-    hats.forEach(h => img.classList.remove(`hat-${h.id}`));
-    if (equippedHat !== "none") img.classList.add(`hat-${equippedHat}`);
+    // Targets the container to allow CSS ::after overlays
+    const container = document.querySelector('.img-container');
+    if (!container) return;
+    hats.forEach(h => container.classList.remove(`hat-${h.id}`));
+    if (equippedHat !== "none") container.classList.add(`hat-${equippedHat}`);
 }
 
 function buyUpgrade(id) {
@@ -287,7 +303,8 @@ function showParticle(x, y, text) {
 }
 
 function saveGame() {
-    const gameData = { energy, clickPower, cps, goldenTortas, upgrades, mysteryEggCost, equippedHat };
+    const ownedHats = hats.filter(h => h.owned).map(h => h.id);
+    const gameData = { energy, clickPower, cps, goldenTortas, upgrades, mysteryEggCost, equippedHat, ownedHats };
     localStorage.setItem(SAVE_KEY, JSON.stringify(gameData));
 }
 
@@ -301,6 +318,14 @@ function loadGame() {
         goldenTortas = d.goldenTortas || 0;
         mysteryEggCost = d.mysteryEggCost || 500;
         equippedHat = d.equippedHat || "none";
+        
+        if (d.ownedHats) {
+            d.ownedHats.forEach(id => {
+                const hat = hats.find(h => h.id === id);
+                if (hat) hat.owned = true;
+            });
+        }
+
         if (d.upgrades) {
             d.upgrades.forEach(savedU => {
                 const currentU = upgrades.find(u => u.id === savedU.id);
