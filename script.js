@@ -329,17 +329,15 @@ function loadGame() {
         clickPower = d.clickPower || 1; 
         cps = d.cps || 0;
         goldenTortas = d.goldenTortas || 0; 
-        mysteryEggCost = d.mysteryEggCost || 500; // Loads the saved price
+        mysteryEggCost = d.mysteryEggCost || 500; 
         equippedHat = d.equippedHat || "none"; 
         usedCodes = d.usedCodes || [];
 
-        // Update the Mystery Egg button text immediately
         const mysteryBtn = document.getElementById('mystery-egg-btn');
         if (mysteryBtn) {
             mysteryBtn.innerText = `CRACK MYSTERY EGG (Cost: ${mysteryEggCost})`;
         }
 
-        // --- OFFLINE GAINS MATH ---
         if (d.lastSaveTime && cps > 0) {
             const now = Date.now();
             const diffSeconds = (now - d.lastSaveTime) / 1000;
@@ -372,7 +370,14 @@ function loadGame() {
     updateUI();
 }
 
-function resetGame() { if (confirm("Wipe all progress?")) { localStorage.removeItem(SAVE_KEY); location.reload(); } }
+function resetGame() { 
+    if (confirm("Wipe all progress?")) { 
+        localStorage.removeItem(SAVE_KEY); 
+        // Force the internal cost back to default before refresh
+        mysteryEggCost = 500; 
+        location.reload(); 
+    } 
+}
 
 loadGame();
 setInterval(saveGame, 10000);
