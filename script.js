@@ -21,7 +21,7 @@ const hats = [
     { id: 'none', name: 'No Hat', cost: 0, owned: true, buff: 1, type: 'none', desc: 'Just regular Lincoln.' },
     { id: 'tophat', name: 'Top Hat', cost: 5, owned: false, buff: 0.90, type: 'discount', desc: 'Classy! Shop items cost 10% less.' },
     { id: 'propeller', name: 'Propeller', cost: 10, owned: false, buff: 2.0, type: 'gold', desc: 'Lucky! 2x Golden Egg spawns.' },
-    { id: 'bunnyears', name: 'Bunny Ears', cost: 25, owned: false, buff: 1.5, type: 'click', desc: 'Easter Spirit! +50% Click Power.' }
+    { id: 'bunnyears', name: 'Bunny Ears', cost: 25, owned: false, buff: 1.5, type: 'click', desc: '✨ LIMITED TIME! ✨ Easter Spirit! +50% Click Power.' }
 ];
 
 // --- 7-DAY PROGRESS LOGIC ---
