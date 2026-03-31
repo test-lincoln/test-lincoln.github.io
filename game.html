@@ -21,6 +21,11 @@
         </div>
 
         <div class="log-section">
+            <h3 style="color: var(--deep-purple);">💤 Offline Gains</h3>
+            <p>Lincoln doesn't stop when you do! You now earn <b>50% of your CPS</b> while the game is closed. Come back to a pile of eggs every time!</p>
+        </div>
+
+        <div class="log-section">
             <h3 style="color: var(--deep-purple);">🔑 Secret Codes</h3>
             <p>Keep your eyes peeled for secret passwords! Enter them in the new "Secret Codes" box to unlock instant eggs, carrots, or power-ups. Shh use code "BUNNY"</p>
         </div>
@@ -43,6 +48,11 @@
         <div class="log-section">
             <h3>📈 Global Hunt Progress</h3>
             <p>The hunt progress bar now updates daily! We reach the "Spring Revelry" in exactly 7 days. Reach 100 Million eggs to unlock the <b>Big Reveal</b> and earn Golden Carrots.</p>
+        </div>
+
+        <div class="log-section">
+            <h3>🛍️ New Shop Items</h3>
+            <p>Added 15 unique upgrades including the <b>Diamond Egg</b>, <b>Candy Kingdom</b>, and the ultimate <b>Easter Morning Sun</b>.</p>
         </div>
 
         <button class="close-log-btn" onclick="toggleLog(false)">START HUNTING!</button>
@@ -126,7 +136,7 @@ const hats = [
     { id: 'bunnyears', name: 'Bunny Ears', cost: 25, owned: false, buff: 1.5, type: 'click', desc: 'Easter Spirit! +50% Click Power.' }
 ];
 
-// --- REBALANCED UPGRADES (Sync'd to 100M scale) ---
+// --- REBALANCED UPGRADES ---
 const initialUpgrades = [
     { id: 0, name: "Marshmallow Chick", cost: 15, power: 0.5, type: "click", desc: "Sweet and squishy. +0.5 Click" },
     { id: 1, name: "Plastic Egg", cost: 80, power: 1.2, type: "cps", desc: "What's inside? +1.2/sec" },
@@ -182,7 +192,7 @@ function spawnGoldenEgg() {
     egg.className = 'golden-egg';
     egg.style.top = Math.random() * 60 + 20 + "%";
     egg.onclick = function() {
-        let bonus = Math.max(100, energy * 0.15); // 15% Bonus
+        let bonus = Math.max(100, energy * 0.15); 
         energy += bonus;
         showParticle(window.innerWidth/2, window.innerHeight/2, `GOLDEN SURPRISE: +${Math.floor(bonus)}`);
         egg.remove();
@@ -250,7 +260,7 @@ function buyUpgrade(id) {
         energy -= cost;
         u.count = (u.count || 0) + 1;
         if (u.type === "click") clickPower += u.power; else cps += u.power;
-        u.cost = Math.ceil(u.cost * 1.15); // NO PRICE CAP
+        u.cost = Math.ceil(u.cost * 1.15); 
         updateUI(); saveGame();
     }
 }
@@ -283,16 +293,36 @@ function showParticle(x, y, text) {
 }
 
 function saveGame() {
-    const data = { energy, clickPower, cps, goldenTortas, upgrades, mysteryEggCost, equippedHat, usedCodes, ownedHats: hats.filter(h=>h.owned).map(h=>h.id) };
+    const data = { 
+        energy, clickPower, cps, goldenTortas, upgrades, mysteryEggCost, 
+        equippedHat, usedCodes, ownedHats: hats.filter(h=>h.owned).map(h=>h.id),
+        lastSave: Date.now()
+    };
     localStorage.setItem(SAVE_KEY, JSON.stringify(data));
 }
 
 function loadGame() {
     const saved = JSON.parse(localStorage.getItem(SAVE_KEY));
     if (saved) {
-        energy = saved.energy || 0; clickPower = saved.clickPower || 1; cps = saved.cps || 0;
-        goldenTortas = saved.goldenTortas || 0; mysteryEggCost = saved.mysteryEggCost || 500;
-        equippedHat = saved.equippedHat || "none"; usedCodes = saved.usedCodes || [];
+        energy = saved.energy || 0; 
+        clickPower = saved.clickPower || 1; 
+        cps = saved.cps || 0;
+        goldenTortas = saved.goldenTortas || 0; 
+        mysteryEggCost = saved.mysteryEggCost || 500;
+        equippedHat = saved.equippedHat || "none"; 
+        usedCodes = saved.usedCodes || [];
+        
+        // Handle offline gains
+        if (saved.lastSave) {
+            const now = Date.now();
+            const secondsAway = (now - saved.lastSave) / 1000;
+            const offlineGains = (cps * 0.5) * secondsAway;
+            if (offlineGains > 0) {
+                energy += offlineGains;
+                alert(`Welcome back! Lincoln found ${Math.floor(offlineGains).toLocaleString()} eggs while you were away!`);
+            }
+        }
+
         if (saved.ownedHats) saved.ownedHats.forEach(id => { const h = hats.find(x=>x.id===id); if(h) h.owned = true; });
         if (saved.upgrades) upgrades = saved.upgrades;
     }
