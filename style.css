@@ -92,6 +92,7 @@ body {
     flex-direction: column;
 }
 
+/* Updated Upgrade UI for better balance feedback */
 .upgrade {
     width: 100%; 
     background: var(--white); 
@@ -106,14 +107,16 @@ body {
     margin-bottom: 12px;
     transition: 0.2s ease;
     box-sizing: border-box;
-    min-height: 85px; 
+    min-height: 90px; 
     flex-shrink: 0;
 }
 
+/* Highlighted when you can afford the new prices */
 .can-afford { 
     border-color: var(--grass) !important; 
     background: var(--sunshine); 
     transform: translateY(-2px); 
+    box-shadow: 0 4px 12px rgba(123, 241, 168, 0.2);
 }
 
 .u-info { 
@@ -123,10 +126,10 @@ body {
     gap: 2px;
 }
 
-.u-name { font-weight: bold; color: var(--deep-purple); font-size: 1.05rem; }
+.u-name { font-weight: bold; color: var(--deep-purple); font-size: 1.1rem; }
 .u-desc { font-size: 0.75rem; color: #666; line-height: 1.2; }
-.u-cost { color: #444; font-size: 0.85rem; font-weight: bold; margin-top: 4px; }
-.u-count { font-size: 1.8rem; font-weight: bold; color: var(--bubblegum); opacity: 0.8; margin-left: 10px; }
+.u-cost { color: #444; font-size: 0.9rem; font-weight: bold; margin-top: 4px; }
+.u-count { font-size: 2.2rem; font-weight: bold; color: var(--bubblegum); opacity: 0.8; margin-left: 10px; }
 
 .particle {
     position: fixed;
@@ -236,4 +239,23 @@ body {
 .cracked #egg-prize { 
     opacity: 1; 
     transform: scale(1.4); 
+}
+
+/* Prestige (Golden Carrot) Button Styling */
+#prestige-btn {
+    background: linear-gradient(135deg, var(--gold), #f39c12);
+    color: white;
+    border: 3px solid var(--white);
+    padding: 15px;
+    border-radius: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+    box-shadow: 0 5px 15px rgba(241, 196, 15, 0.4);
+    display: none;
+    transition: 0.3s;
+}
+
+#prestige-btn:hover {
+    transform: scale(1.05);
 }
