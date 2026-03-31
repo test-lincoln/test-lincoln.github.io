@@ -54,16 +54,30 @@ function checkTacoTuesday() {
     const isTuesday = now.getDay() === 2; 
     const feedback = document.getElementById('code-feedback');
     const label = document.getElementById('env-label');
+    const root = document.documentElement;
 
     if (isTuesday) {
         eventMultiplier = 5;
+        
+        // APPLY TACO COLORS
+        root.style.setProperty('--lavender', '#f6c95c'); // Shell Yellow
+        root.style.setProperty('--deep-purple', '#983d00'); // Meat Brown
+        root.style.setProperty('--soft-pink', '#41a332'); // Lettuce Green
+        root.style.setProperty('--grass', '#c91919'); // Tomato Red
+        root.style.setProperty('--sunshine', '#e7af00'); // Cheese Gold
+
         if (feedback) {
             feedback.innerText = "🌮 TACO TUESDAY ACTIVE! 5x CLICKS! 🌮";
-            feedback.style.color = "orange";
+            feedback.style.color = "#c91919";
         }
-        if (label) label.style.color = "#ffcc00";
     } else {
         eventMultiplier = 1;
+        // RESET TO DEFAULT (Assuming your original CSS variables)
+        root.style.setProperty('--lavender', '#E6E6FA');
+        root.style.setProperty('--deep-purple', '#4B0082');
+        root.style.setProperty('--soft-pink', '#FFB6C1');
+        root.style.setProperty('--grass', '#7CFC00');
+        root.style.setProperty('--sunshine', '#FFD700');
         if (label) label.style.color = "";
     }
 }
@@ -271,10 +285,20 @@ function updateUI() {
     const body = document.body; 
     const label = document.getElementById('env-label');
     if (label) {
-        if (energy < 100000) { body.className = 'bg-kitchen'; label.innerText = eventMultiplier > 1 ? "EVENT: TACO FIESTA" : "LOCATION: THE GARDEN GATE"; }
-        else if (energy < 10000000) { body.className = 'bg-buffet'; label.innerText = eventMultiplier > 1 ? "EVENT: TACO FIESTA" : "LOCATION: BLOOMING FLOWERBEDS"; }
-        else if (energy < 50000000) { body.className = 'bg-factory'; label.innerText = eventMultiplier > 1 ? "EVENT: TACO FIESTA" : "LOCATION: CANDY WORKSHOP"; }
-        else { body.className = 'bg-space'; label.innerText = eventMultiplier > 1 ? "EVENT: TACO FIESTA" : "LOCATION: THE GREAT EGG NEBULA"; }
+        if (eventMultiplier > 1) {
+            body.className = 'bg-taco'; // Special class for Taco Tuesday
+            label.innerText = "EVENT: LINCOLN'S TACO FIESTA";
+            label.style.color = "#e7af00";
+            // Dynamically set background pattern if CSS class isn't in your style tag
+            body.style.backgroundColor = "#f6c95c";
+            body.style.backgroundImage = "url('https://www.transparenttextures.com/patterns/food.png')";
+        } else {
+            body.style.backgroundImage = "";
+            if (energy < 100000) { body.className = 'bg-kitchen'; label.innerText = "LOCATION: THE GARDEN GATE"; }
+            else if (energy < 10000000) { body.className = 'bg-buffet'; label.innerText = "LOCATION: BLOOMING FLOWERBEDS"; }
+            else if (energy < 50000000) { body.className = 'bg-factory'; label.innerText = "LOCATION: CANDY WORKSHOP"; }
+            else { body.className = 'bg-space'; label.innerText = "LOCATION: THE GREAT EGG NEBULA"; }
+        }
     }
     refreshWardrobeUI();
 }
