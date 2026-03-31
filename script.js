@@ -295,7 +295,6 @@ function prestige() {
         clickPower = 1; 
         cps = 0;
         
-        // --- THE FIX: Reset mystery egg cost ---
         mysteryEggCost = 500; 
         const mysteryBtn = document.getElementById('mystery-egg-btn');
         if (mysteryBtn) {
@@ -370,15 +369,17 @@ function loadGame() {
     updateUI();
 }
 
+// --- FEEDBACK POP-UP LOGIC ---
 function toggleFeedback(show) {
     const overlay = document.getElementById('feedback-overlay');
-    overlay.style.display = show ? 'flex' : 'none';
+    if (overlay) {
+        overlay.style.display = show ? 'flex' : 'none';
+    }
 }
 
 function resetGame() { 
     if (confirm("Wipe all progress?")) { 
         localStorage.removeItem(SAVE_KEY); 
-        // Force the internal cost back to default before refresh
         mysteryEggCost = 500; 
         location.reload(); 
     } 
