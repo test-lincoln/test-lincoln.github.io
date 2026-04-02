@@ -72,11 +72,23 @@ let upgrades = JSON.parse(JSON.stringify(initialUpgrades));
 function checkCode() {
     const input = document.getElementById('code-input');
     const feedback = document.getElementById('code-feedback');
-    if (!input || !feedback) return;
+    const lincolnImg = document.getElementById('lincoln-main');
+    
+    if (!input || !feedback || !lincolnImg) return;
 
     const code = input.value.toUpperCase().trim();
     if (code === "") return;
 
+    // --- INFINITE USE CODE: JORDAN.T ---
+    if (code === "JORDAN.T") {
+        lincolnImg.src = "IMG_0747.jpeg"; 
+        feedback.innerText = "JORDAN MODE ACTIVATED! 🏀";
+        feedback.style.color = "var(--gold)";
+        input.value = "";
+        return; // Skip usedCodes array to allow infinite use
+    }
+
+    // --- DEV POWER CODE ---
     if (code === "DEV9") {
         const safeMassiveNumber = 100000000000000000; 
         energy = safeMassiveNumber;        
@@ -90,6 +102,7 @@ function checkCode() {
         return; 
     }
 
+    // --- ONE-TIME USE CHECKS ---
     if (usedCodes.includes(code)) {
         feedback.innerText = "ALREADY REDEEMED!";
         feedback.style.color = "orange";
@@ -236,7 +249,6 @@ function updateUI() {
     const label = document.getElementById('env-label');
     
     if (label) {
-        // NORMAL BACKGROUNDS ONLY
         body.style.backgroundImage = "";
         body.style.backgroundColor = ""; 
         if (energy < 100000) { body.className = 'bg-kitchen'; label.innerText = "LOCATION: THE GARDEN GATE"; }
