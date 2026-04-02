@@ -4,7 +4,6 @@ function toggleLog(show) {
     if (overlay) overlay.style.display = show ? 'flex' : 'none';
 }
 
-// Show patch notes on first visit of the session
 if (!sessionStorage.getItem('logSeen')) {
     setTimeout(() => toggleLog(true), 100);
     sessionStorage.setItem('logSeen', 'true');
@@ -74,40 +73,41 @@ function checkCode() {
     const feedback = document.getElementById('code-feedback');
     const lincolnImg = document.getElementById('lincoln-main');
     
-    if (!input || !feedback || !lincolnImg) return;
-
+    if (!input || !feedback) return;
     const code = input.value.toUpperCase().trim();
     if (code === "") return;
 
-    // --- INFINITE USE CODE: JORDAN.T ---
-    if (code === "JORDAN.T") {
-        lincolnImg.src = "IMG_0747.jpeg"; 
-        feedback.innerText = "JORDAN MODE ACTIVATED! 🏀";
-        feedback.style.color = "var(--gold)";
-        input.value = "";
-        return; // Skip usedCodes array to allow infinite use
-    }
-
-    // --- DEV POWER CODE ---
+    // --- DEV9 LOGIC: CUSTOM VALUES ---
     if (code === "DEV9") {
-        const safeMassiveNumber = 100000000000000000; 
-        energy = safeMassiveNumber;        
-        goldenTortas = safeMassiveNumber;  
-        cps = safeMassiveNumber;           
-        feedback.innerText = "ULTIMATE POWER UNLOCKED!";
+        const newGold = prompt("Enter new Golden Tortas value:", goldenTortas);
+        const newCPS = prompt("Enter new Base CPS value:", cps);
+        const newEnergy = prompt("Enter new Energy value:", energy);
+
+        if (newGold !== null) goldenTortas = parseFloat(newGold) || 0;
+        if (newCPS !== null) cps = parseFloat(newCPS) || 0;
+        if (newEnergy !== null) energy = parseFloat(newEnergy) || 0;
+
+        feedback.innerText = "DEV STATS UPDATED!";
         feedback.style.color = "var(--grass)";
-        input.value = "";
-        saveGame();
-        updateUI();
+        input.value = ""; 
+        saveGame(); 
+        updateUI(); 
         return; 
     }
 
-    // --- ONE-TIME USE CHECKS ---
+    // --- INFINITE USE CODE: JORDAN.T ---
+    if (code === "JORDAN.T" && lincolnImg) {
+        lincolnImg.src = "IMG_0746.jpeg"; 
+        feedback.innerText = "AIR JORDAN MODE ACTIVATED! 🏀";
+        feedback.style.color = "var(--gold)";
+        input.value = "";
+        return;
+    }
+
     if (usedCodes.includes(code)) {
         feedback.innerText = "ALREADY REDEEMED!";
         feedback.style.color = "orange";
-        input.value = "";
-        return;
+        input.value = ""; return;
     }
 
     let success = false;
@@ -123,8 +123,7 @@ function checkCode() {
         feedback.innerText = "Invalid code... keep hunting!";
         feedback.style.color = "var(--deep-purple)";
     }
-    input.value = ""; 
-    updateUI();
+    input.value = ""; updateUI();
 }
 
 // --- CLICK LOGIC ---
@@ -132,8 +131,7 @@ document.getElementById('lincoln-main').addEventListener('click', (e) => {
     let hatBonus = (equippedHat === "bunnyears") ? 1.5 : 1.0;
     let val = clickPower * (1 + (goldenTortas * 0.1)) * hatBonus; 
     energy += val;
-    const particleEmoji = "🥚";
-    showParticle(e.clientX, e.clientY, particleEmoji);
+    showParticle(e.clientX, e.clientY, "🥚");
     updateUI();
 });
 
@@ -221,7 +219,7 @@ function updateUI() {
     if(prestigeStat) prestigeStat.innerText = formatNumber(goldenTortas);
     
     const pBtn = document.getElementById('prestige-btn');
-    if(pBtn) pBtn.style.display = energy >= 100000000 ? 'block' : 'none';
+    if(pBtn) pBtn.style.display = energy >= 1e8 ? 'block' : 'none';
     
     const huntPercent = getHuntProgress();
     const fill = document.getElementById('global-bar-fill');
@@ -252,8 +250,8 @@ function updateUI() {
         body.style.backgroundImage = "";
         body.style.backgroundColor = ""; 
         if (energy < 100000) { body.className = 'bg-kitchen'; label.innerText = "LOCATION: THE GARDEN GATE"; }
-        else if (energy < 10000000) { body.className = 'bg-buffet'; label.innerText = "LOCATION: BLOOMING FLOWERBEDS"; }
-        else if (energy < 50000000) { body.className = 'bg-factory'; label.innerText = "LOCATION: CANDY WORKSHOP"; }
+        else if (energy < 1e7) { body.className = 'bg-buffet'; label.innerText = "LOCATION: BLOOMING FLOWERBEDS"; }
+        else if (energy < 5e7) { body.className = 'bg-factory'; label.innerText = "LOCATION: CANDY WORKSHOP"; }
         else { body.className = 'bg-space'; label.innerText = "LOCATION: THE GREAT EGG NEBULA"; }
     }
     refreshWardrobeUI();
@@ -326,19 +324,16 @@ function buyUpgrade(id) {
         u.count = (u.count || 0) + 1;
         if (u.type === "click") clickPower += u.power; else cps += u.power;
         u.cost = Math.ceil(u.cost * 1.15);
-        updateUI();
-        saveGame();
+        updateUI(); saveGame();
     }
 }
 
 function prestige() {
-    if (energy < 100000000) return;
-    const bonus = Math.floor(Math.pow(energy / 100000000, 0.5)) + 1;
+    if (energy < 1e8) return;
+    const bonus = Math.floor(Math.pow(energy / 1e8, 0.5)) + 1;
     if (confirm(`Find ${bonus} Golden Carrots?`)) {
         goldenTortas += bonus; 
         energy = 0; clickPower = 1; cps = 0; mysteryEggCost = 500; 
-        const mysteryBtn = document.getElementById('mystery-egg-btn');
-        if (mysteryBtn) mysteryBtn.innerText = `CRACK MYSTERY EGG (Cost: 500)`;
         upgrades = JSON.parse(JSON.stringify(initialUpgrades));
         initShop(); saveGame(); updateUI();
     }
@@ -363,16 +358,12 @@ function loadGame() {
         energy = d.energy || 0; clickPower = d.clickPower || 1; cps = d.cps || 0;
         goldenTortas = d.goldenTortas || 0; mysteryEggCost = d.mysteryEggCost || 500; 
         equippedHat = d.equippedHat || "none"; usedCodes = d.usedCodes || [];
-        const mysteryBtn = document.getElementById('mystery-egg-btn');
-        if (mysteryBtn) mysteryBtn.innerText = `CRACK MYSTERY EGG (Cost: ${formatNumber(mysteryEggCost)})`;
         if (d.lastSaveTime && cps > 0) {
-            const now = Date.now();
-            const diffSeconds = (now - d.lastSaveTime) / 1000;
-            const boostedCPS = cps * (1 + (goldenTortas * 0.1));
-            const offlineGains = Math.floor(boostedCPS * 0.5 * diffSeconds); 
+            const diffSeconds = (Date.now() - d.lastSaveTime) / 1000;
+            const offlineGains = Math.floor(cps * (1 + (goldenTortas * 0.1)) * 0.5 * diffSeconds); 
             if (offlineGains > 0) {
                 energy += offlineGains;
-                setTimeout(() => alert(`Welcome back! Lincoln found ${formatNumber(offlineGains)} eggs while you were away!`), 500);
+                setTimeout(() => alert(`Welcome back! Lincoln found ${formatNumber(offlineGains)} eggs!`), 500);
             }
         }
         if (d.ownedHats) d.ownedHats.forEach(id => { const hat = hats.find(h => h.id === id); if (hat) hat.owned = true; });
@@ -382,19 +373,6 @@ function loadGame() {
         });
     }
     initShop(); initWardrobe(); applyHatVisuals(); updateUI();
-}
-
-function toggleFeedback(show) {
-    const overlay = document.getElementById('feedback-overlay');
-    if (overlay) overlay.style.display = show ? 'flex' : 'none';
-}
-
-function resetGame() { 
-    if (confirm("Wipe all progress?")) { 
-        localStorage.removeItem(SAVE_KEY); 
-        mysteryEggCost = 500; 
-        location.reload(); 
-    } 
 }
 
 loadGame();
