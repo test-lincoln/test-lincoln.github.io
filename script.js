@@ -97,8 +97,8 @@ function checkCode() {
 
     // --- INFINITE USE CODE: JORDAN.T ---
     if (code === "JORDAN.T" && lincolnImg) {
-        lincolnImg.src = "IMG_0746.jpeg"; 
-        feedback.innerText = "AIR JORDAN MODE ACTIVATED! 🏀";
+        lincolnImg.src = "IMG_0747.jpeg"; 
+        feedback.innerText = "JORDAN MODE ACTIVATED! 🏀";
         feedback.style.color = "var(--gold)";
         input.value = "";
         return;
