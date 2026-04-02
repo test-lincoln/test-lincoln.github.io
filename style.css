@@ -28,7 +28,7 @@ body {
 .bg-factory { background-image: linear-gradient(rgba(255,255,255,0.7), rgba(255,255,255,0.7)), url('https://images.unsplash.com/photo-1558961312-30ca048846c8?auto=format&fit=crop&w=1200'); }
 .bg-space { background-image: linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.6)), url('https://images.unsplash.com/photo-1534067783941-51c9c23ecefd?auto=format&fit=crop&w=1200'); }
 
-/* --- NAVIGATION BUTTONS (STACKED ON RIGHT) --- */
+/* --- NAVIGATION BUTTONS --- */
 .nav-buttons {
     position: fixed !important;
     top: 20px !important;
@@ -49,7 +49,7 @@ body {
     font-weight: bold;
     transition: 0.2s;
     box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    width: 140px; /* Fixed width for alignment */
+    width: 140px; 
     text-align: center;
     white-space: nowrap;
 }
@@ -193,7 +193,6 @@ body {
     content: "";
 }
 
-/* Specific Hat Visuals */
 .hat-tophat #lincoln-main { border-color: #444 !important; }
 .hat-tophat::after {
     content: "🎩";
@@ -405,7 +404,7 @@ body {
     transform: scale(1.4); 
 }
 
-/* Prestige (Golden Carrot) Button Styling */
+/* Prestige Button Styling */
 #prestige-btn {
     background: linear-gradient(135deg, var(--gold), #f39c12);
     color: white;
