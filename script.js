@@ -24,7 +24,6 @@ let energy = 0, clickPower = 1, cps = 0, goldenTortas = 0;
 let mysteryEggCost = 500;
 let equippedHat = "none"; 
 let usedCodes = []; 
-let eventMultiplier = 1; // Taco Tuesday Multiplier
 
 // --- WARDROBE DATA ---
 const hats = [
@@ -47,52 +46,6 @@ function getHuntProgress() {
     if (percent > 100) percent = 100;
     return Math.floor(percent);
 }
-
-// --- TACO TUESDAY LOGIC ---
-function checkTacoTuesday() {
-    const now = new Date();
-    const isTuesday = now.getDay() === 2; 
-    const feedback = document.getElementById('code-feedback');
-    const root = document.documentElement;
-
-    if (isTuesday) {
-        eventMultiplier = 5;
-        
-        // APPLY TACO COLORS
-        root.style.setProperty('--lavender', '#f6c95c'); // Shell Yellow
-        root.style.setProperty('--deep-purple', '#983d00'); // Meat Brown
-        root.style.setProperty('--soft-pink', '#41a332'); // Lettuce Green
-        root.style.setProperty('--grass', '#c91919'); // Tomato Red
-        root.style.setProperty('--sunshine', '#e7af00'); // Cheese Gold
-
-        if (feedback) {
-            feedback.innerText = "🌮 TACO TUESDAY ACTIVE! 5x CLICKS! 🌮";
-            feedback.style.color = "#c91919";
-        }
-    } else {
-        eventMultiplier = 1;
-        // RESET TO DEFAULT
-        root.style.setProperty('--lavender', '#E6E6FA');
-        root.style.setProperty('--deep-purple', '#4B0082');
-        root.style.setProperty('--soft-pink', '#FFB6C1');
-        root.style.setProperty('--grass', '#7CFC00');
-        root.style.setProperty('--sunshine', '#FFD700');
-    }
-}
-
-function createFallingTaco() {
-    if (new Date().getDay() !== 2) return;
-    const taco = document.createElement('div');
-    taco.innerText = "🌮";
-    taco.style.cssText = `position:fixed; top:-50px; left:${Math.random()*100}vw; font-size:${Math.random()*20+20}px; z-index:9999; pointer-events:none; transition:transform 3s linear, opacity 3s linear;`;
-    document.body.appendChild(taco);
-    setTimeout(() => {
-        taco.style.transform = `translateY(${window.innerHeight + 100}px) rotate(${Math.random()*360}deg)`;
-        taco.style.opacity = '0';
-    }, 100);
-    setTimeout(() => taco.remove(), 4000);
-}
-setInterval(createFallingTaco, 400);
 
 // --- REBALANCED UPGRADES ---
 const initialUpgrades = [
@@ -164,9 +117,9 @@ function checkCode() {
 // --- CLICK LOGIC ---
 document.getElementById('lincoln-main').addEventListener('click', (e) => {
     let hatBonus = (equippedHat === "bunnyears") ? 1.5 : 1.0;
-    let val = clickPower * (1 + (goldenTortas * 0.1)) * hatBonus * eventMultiplier; 
+    let val = clickPower * (1 + (goldenTortas * 0.1)) * hatBonus; 
     energy += val;
-    const particleEmoji = (new Date().getDay() === 2) ? "🌮" : "🥚";
+    const particleEmoji = "🥚";
     showParticle(e.clientX, e.clientY, particleEmoji);
     updateUI();
 });
@@ -241,13 +194,12 @@ function crackMysteryEgg() {
 
 // --- UI AND SHOP LOGIC ---
 function updateUI() {
-    checkTacoTuesday();
     const scoreElement = document.getElementById('score-text');
     if(scoreElement) scoreElement.innerText = formatNumber(energy);
     
     let hatClickMult = (equippedHat === "bunnyears") ? 1.5 : 1.0;
     const clickStat = document.getElementById('stat-click');
-    if(clickStat) clickStat.innerText = formatNumber(clickPower * (1 + (goldenTortas * 0.1)) * hatClickMult * eventMultiplier);
+    if(clickStat) clickStat.innerText = formatNumber(clickPower * (1 + (goldenTortas * 0.1)) * hatClickMult);
     
     const cpsStat = document.getElementById('stat-cps');
     if(cpsStat) cpsStat.innerText = formatNumber(cps * (1 + (goldenTortas * 0.1)));
@@ -284,26 +236,13 @@ function updateUI() {
     const label = document.getElementById('env-label');
     
     if (label) {
-        if (eventMultiplier > 1) {
-            // TACO TUESDAY BACKGROUND INJECTION
-            body.className = 'bg-taco'; 
-            label.innerText = "🌮 EVENT: TACO TUESDAY FIESTA 🌮";
-            label.style.color = "#c91919";
-            
-            // This is the Taco Specific Background logic
-            body.style.backgroundColor = "#f6c95c";
-            // Use a SVG Data URI for a reliable taco-pattern background
-            body.style.backgroundImage = `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext y='35' font-size='30'%3E🌮%3C/text%3E%3C/svg%3E")`;
-            body.style.backgroundRepeat = "repeat";
-        } else {
-            // NORMAL BACKGROUNDS
-            body.style.backgroundImage = "";
-            body.style.backgroundColor = ""; 
-            if (energy < 100000) { body.className = 'bg-kitchen'; label.innerText = "LOCATION: THE GARDEN GATE"; }
-            else if (energy < 10000000) { body.className = 'bg-buffet'; label.innerText = "LOCATION: BLOOMING FLOWERBEDS"; }
-            else if (energy < 50000000) { body.className = 'bg-factory'; label.innerText = "LOCATION: CANDY WORKSHOP"; }
-            else { body.className = 'bg-space'; label.innerText = "LOCATION: THE GREAT EGG NEBULA"; }
-        }
+        // NORMAL BACKGROUNDS ONLY
+        body.style.backgroundImage = "";
+        body.style.backgroundColor = ""; 
+        if (energy < 100000) { body.className = 'bg-kitchen'; label.innerText = "LOCATION: THE GARDEN GATE"; }
+        else if (energy < 10000000) { body.className = 'bg-buffet'; label.innerText = "LOCATION: BLOOMING FLOWERBEDS"; }
+        else if (energy < 50000000) { body.className = 'bg-factory'; label.innerText = "LOCATION: CANDY WORKSHOP"; }
+        else { body.className = 'bg-space'; label.innerText = "LOCATION: THE GREAT EGG NEBULA"; }
     }
     refreshWardrobeUI();
 }
