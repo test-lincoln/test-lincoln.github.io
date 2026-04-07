@@ -24,6 +24,13 @@ let mysteryEggCost = 500;
 let equippedHat = "none"; 
 let usedCodes = []; 
 
+// --- DAY/NIGHT & BOSS STATE ---
+let gameTime = 0; // 0 to 100 (0-50 Day, 50-100 Night)
+let isBossActive = false;
+let bossHP = 0;
+let bossMaxHP = 0;
+let bossTimer = 0;
+
 // --- WARDROBE DATA ---
 const hats = [
     { id: 'none', name: 'No Hat', cost: 0, owned: true, buff: 1, type: 'none', desc: 'Just regular Lincoln.' },
@@ -77,16 +84,13 @@ function checkCode() {
     const code = input.value.toUpperCase().trim();
     if (code === "") return;
 
-    // --- DEV9 LOGIC: CUSTOM VALUES ---
     if (code === "DEV9") {
         const newGold = prompt("Enter new Golden Tortas value:", goldenTortas);
         const newCPS = prompt("Enter new Base CPS value:", cps);
         const newEnergy = prompt("Enter new Energy value:", energy);
-
         if (newGold !== null) goldenTortas = parseFloat(newGold) || 0;
         if (newCPS !== null) cps = parseFloat(newCPS) || 0;
         if (newEnergy !== null) energy = parseFloat(newEnergy) || 0;
-
         feedback.innerText = "DEV STATS UPDATED!";
         feedback.style.color = "var(--grass)";
         input.value = ""; 
@@ -95,7 +99,6 @@ function checkCode() {
         return; 
     }
 
-    // --- INFINITE USE CODE: JORDAN.T ---
     if (code === "JORDAN.T" && lincolnImg) {
         lincolnImg.src = "IMG_0747.jpeg"; 
         feedback.innerText = "JORDAN MODE ACTIVATED! 🏀";
@@ -128,22 +131,93 @@ function checkCode() {
 
 // --- CLICK LOGIC ---
 document.getElementById('lincoln-main').addEventListener('click', (e) => {
+    handleLincolnClick(e.clientX, e.clientY);
+});
+
+function handleLincolnClick(x, y) {
     let hatBonus = (equippedHat === "bunnyears") ? 1.5 : 1.0;
     let val = clickPower * (1 + (goldenTortas * 0.1)) * hatBonus; 
     energy += val;
-    showParticle(e.clientX, e.clientY, "🥚");
+    showParticle(x, y, "🥚");
     updateUI();
-});
+}
 
-// --- CPS INTERVAL ---
+// --- BOSS LOGIC ---
+function startBossRaid() {
+    if (isBossActive) return;
+    isBossActive = true;
+    bossMaxHP = Math.max(100, (clickPower * 150) + (cps * 10));
+    bossHP = bossMaxHP;
+    bossTimer = 20;
+
+    const container = document.getElementById('boss-container');
+    container.style.display = 'flex';
+    updateBossUI();
+
+    const bossInterval = setInterval(() => {
+        bossTimer--;
+        if (bossTimer <= 0) {
+            clearInterval(bossInterval);
+            endBossRaid(false);
+        }
+        updateBossUI();
+    }, 1000);
+}
+
+function updateBossUI() {
+    const fill = document.getElementById('boss-hp-fill');
+    const timerText = document.getElementById('boss-timer');
+    if (fill) fill.style.width = (bossHP / bossMaxHP * 100) + "%";
+    if (timerText) timerText.innerText = `TIME LEFT: ${bossTimer}s`;
+}
+
+function hitBoss() {
+    let hatBonus = (equippedHat === "bunnyears") ? 1.5 : 1.0;
+    let damage = clickPower * (1 + (goldenTortas * 0.1)) * hatBonus;
+    bossHP -= damage;
+    if (bossHP <= 0) {
+        endBossRaid(true);
+    }
+    updateBossUI();
+}
+
+function endBossRaid(success) {
+    isBossActive = false;
+    document.getElementById('boss-container').style.display = 'none';
+    if (success) {
+        let reward = Math.max(5000, energy * 0.5);
+        energy += reward;
+        goldenTortas += 1;
+        alert(`VICTORY! You ate the Chocolate Behemoth!\nReward: ${formatNumber(reward)} Eggs & 1 Golden Carrot!`);
+    } else {
+        alert("The Chocolate Behemoth hopped away...");
+    }
+    updateUI();
+}
+
+// --- DAY/NIGHT CYCLE LOGIC ---
+function updateCycle() {
+    gameTime += 0.5;
+    if (gameTime > 100) gameTime = 0;
+
+    if (gameTime > 50) {
+        document.body.classList.add('night-time');
+    } else {
+        document.body.classList.remove('night-time');
+    }
+}
+
+// --- CPS & CYCLE INTERVAL ---
 setInterval(() => { 
     let boostedCPS = cps * (1 + (goldenTortas * 0.1)); 
     energy += (boostedCPS / 10); 
+    updateCycle();
     updateUI(); 
 }, 100);
 
 // --- GOLDEN EGG LOGIC ---
 function spawnGoldenEgg() {
+    if (isBossActive) return;
     const egg = document.createElement('div');
     egg.className = 'golden-egg';
     egg.style.top = Math.random() * 60 + 20 + "%";
@@ -162,6 +236,11 @@ setInterval(() => {
     let spawnChance = (equippedHat === "propeller") ? 0.6 : 0.3;
     if(Math.random() < spawnChance) spawnGoldenEgg(); 
 }, 30000);
+
+// Boss Spawn Chance (Every 10 mins approx)
+setInterval(() => {
+    if (Math.random() < 0.1 && energy > 10000) startBossRaid();
+}, 60000);
 
 // --- MYSTERY EGG LOGIC ---
 function crackMysteryEgg() {
@@ -248,11 +327,13 @@ function updateUI() {
     
     if (label) {
         body.style.backgroundImage = "";
-        body.style.backgroundColor = ""; 
         if (energy < 100000) { body.className = 'bg-kitchen'; label.innerText = "LOCATION: THE GARDEN GATE"; }
         else if (energy < 1e7) { body.className = 'bg-buffet'; label.innerText = "LOCATION: BLOOMING FLOWERBEDS"; }
         else if (energy < 5e7) { body.className = 'bg-factory'; label.innerText = "LOCATION: CANDY WORKSHOP"; }
         else { body.className = 'bg-space'; label.innerText = "LOCATION: THE GREAT EGG NEBULA"; }
+        
+        // Append night time class if needed
+        if (gameTime > 50) body.classList.add('night-time');
     }
     refreshWardrobeUI();
 }
