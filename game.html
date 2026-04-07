@@ -6,66 +6,20 @@
     <title>Lincoln's Egg-celent Adventure</title>
     <link rel="icon" type="image/jpeg" href="IMG_0668.jpeg">
     <link rel="stylesheet" href="style.css">
-    <style>
-        /* Container moved to the top right to stack buttons vertically */
-        .nav-buttons {
-            position: fixed;
-            top: 20px;
-            right: 20px; /* Moved to right side */
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            z-index: 1001;
-            align-items: flex-end; /* Aligns buttons to the right edge */
-        }
-
-        #log-open-btn, #feedback-open-btn {
-            padding: 8px 15px;
-            color: white;
-            border: 2px solid white;
-            border-radius: 15px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.2s;
-            width: fit-content;
-        }
-
-        #log-open-btn { background: var(--deep-purple); }
-        #feedback-open-btn { background: var(--bubblegum); }
-
-        #log-open-btn:hover, #feedback-open-btn:hover { transform: scale(1.05); }
-
-        /* Styling for the Feedback Modal */
-        #feedback-overlay {
-            display: none; 
-            position: fixed; 
-            top: 0; left: 0; 
-            width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.7); 
-            z-index: 2000; 
-            justify-content: center; 
-            align-items: center;
-        }
-        .feedback-modal {
-            background: white; 
-            padding: 25px; 
-            border-radius: 20px; 
-            width: 320px; 
-            text-align: center; 
-            border: 4px solid var(--bubblegum);
-        }
-        .feedback-input {
-            width: 100%; 
-            padding: 10px; 
-            margin-bottom: 10px; 
-            border-radius: 10px; 
-            border: 1px solid #ccc; 
-            font-family: inherit; 
-            box-sizing: border-box;
-        }
-    </style>
 </head>
 <body class="bg-kitchen">
+
+<div id="time-overlay"></div>
+
+<div id="boss-container">
+    <h1 style="color: white; text-shadow: 0 0 10px #ff4d4d; margin-bottom: 5px;">BOSS RAID!</h1>
+    <p style="color: var(--sunshine); font-weight: bold; margin-bottom: 20px;">EAT THE CHOCOLATE BEHEMOTH!</p>
+    <img src="IMG_0668.jpeg" id="boss-image" alt="Boss" onclick="hitBoss()">
+    <div id="boss-hp-bar">
+        <div id="boss-hp-fill"></div>
+    </div>
+    <div id="boss-timer">TIME LEFT: 20s</div>
+</div>
 
 <div class="nav-buttons">
     <button id="log-open-btn" onclick="toggleLog(true)">Update Log</button>
@@ -92,43 +46,9 @@
         <h2 style="text-align:center; color:var(--bubblegum);">PATCH NOTES</h2>
         
         <div class="log-section">
-            <h3 style="color: var(--deep-purple);">⚖️ Economy Re-Balance</h3>
-            <p>The game has been tuned for faster Prestige! The <b>Big Reveal</b> now unlocks at <b>100 Million Eggs</b>. All shop prices have been lowered to match this new goal.</p>
-        </div>
-
-        <div class="log-section">
-            <h3 style="color: var(--deep-purple);">💤 Offline Gains</h3>
-            <p>Lincoln doesn't stop when you do! You now earn <b>50% of your CPS</b> while the game is closed. Come back to a pile of eggs every time!</p>
-        </div>
-
-        <div class="log-section">
-            <h3 style="color: var(--deep-purple);">🔑 Secret Codes</h3>
-            <p>Keep your eyes peeled for secret passwords! Enter them in the new "Secret Codes" box to unlock instant eggs, carrots, or power-ups. Shh use code "BUNNY"</p>
-        </div>
-
-        <div class="log-section">
-            <h3>🎩 Lincoln's Wardrobe</h3>
-            <p>Style meets power! You can now spend your <b>Golden Carrots</b> on exclusive hats for Lincoln. Each hat provides a unique permanent buff to help you conquer the hunt!</p>
-        </div>
-
-        <div class="log-section">
-            <h3>🌟 The Golden Egg</h3>
-            <p>A rare Golden Egg now has a 30% chance to float across your screen every 30 seconds! Click it fast—it disappears after 10 seconds. Catching it gives you a massive bonus worth 15% of your total eggs!</p>
-        </div>
-
-        <div class="log-section">
-            <h3>❓ Mystery Eggs</h3>
-            <p>Feeling lucky? Spend your eggs to crack a Mystery Egg. You might hit the <b>5x Jackpot</b>, get a small treat, or find nothing at all! The cost increases each time you play.</p>
-        </div>
-
-        <div class="log-section">
-            <h3>📈 Global Hunt Progress</h3>
-            <p>The hunt progress bar now updates daily! We reach the "Spring Revelry" in exactly 7 days. Reach 100 Million eggs to unlock the <b>Big Reveal</b> and earn Golden Carrots.</p>
-        </div>
-
-        <div class="log-section">
-            <h3>🛍️ New Shop Items</h3>
-            <p>Added 15 unique upgrades including the <b>Diamond Egg</b>, <b>Candy Kingdom</b>, and the ultimate <b>Easter Morning Sun</b>.</p>
+            <h3 style="color: var(--deep-purple);">🍫 The Chocolate Behemoth Update</h3>
+            <p><b>Boss Raids:</b> A massive Chocolate Bunny now has a chance to appear! You have 20 seconds to click it into oblivion for a massive Egg burst and a <b>Golden Carrot</b>.</p>
+            <p><b>Day/Night Cycle:</b> The garden now transitions through time. Watch the sun set and the stars come out as you hunt! Golden Eggs shine brighter at night.</p>
         </div>
 
         <button class="close-log-btn" onclick="toggleLog(false)">START HUNTING!</button>
@@ -189,14 +109,19 @@
             <h3 style="margin: 0 0 5px 0; font-size: 0.9rem; text-align: center; color: var(--deep-purple);">🎩 LINCOLN'S WARDROBE</h3>
             <p style="font-size: 0.6rem; text-align: center; margin-bottom: 10px; color: #666;">Permanent Unlocks • Spend Carrots to Buy</p>
             <div id="wardrobe-list" style="display: flex; gap: 8px; overflow-x: auto; padding: 5px; justify-content: center;">
-                </div>
+            </div>
         </div>
 
-        <div id="shop">
-            </div>
+        <div id="shop"></div>
     </div>
 </div>
 
 <script src="script.js"></script>
+<script>
+    // Helper function for feedback modal toggle
+    function toggleFeedback(show) {
+        document.getElementById('feedback-overlay').style.display = show ? 'flex' : 'none';
+    }
+</script>
 </body>
 </html>
